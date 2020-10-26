@@ -23,7 +23,7 @@ func (c *CA) newSerial() *big.Int {
 
 }
 
-// New creates a new CA struct ready to
+// New creates a new CA struct ready to use
 func New(subject pkix.Name, years, months, days int) (*CA, []byte, []byte, error) {
 
 	var (
@@ -139,6 +139,9 @@ func FromBytes(caCertificate, caKey []byte) (*CA, error) {
 	}
 
 	ca.caKey, err = ca.PrivateKeyFromPEM(caKey)
+	if err != nil {
+		return nil, err
+	}
 
 	return &ca, err
 
