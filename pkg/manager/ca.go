@@ -1,4 +1,4 @@
-package ca
+package manager
 
 import (
 	"bytes"
@@ -80,7 +80,7 @@ func (c *CA) CreateCertificate(request *x509.Certificate) ([]byte, []byte, error
 }
 
 // CertificateFromPEM returns a x509.Certificate from the cert PEM and Key bytes
-func (c *CA) CertificateFromPEM(certPEM []byte) (cert *x509.Certificate, err error) {
+func CertificateFromPEM(certPEM []byte) (cert *x509.Certificate, err error) {
 
 	block, _ := pem.Decode([]byte(certPEM))
 	if block == nil {
@@ -91,7 +91,7 @@ func (c *CA) CertificateFromPEM(certPEM []byte) (cert *x509.Certificate, err err
 }
 
 // PrivateKeyFromPEM returns a rsa.PrivateKey from the PEM bytes
-func (c *CA) PrivateKeyFromPEM(keyPEM []byte) (key *rsa.PrivateKey, err error) {
+func PrivateKeyFromPEM(keyPEM []byte) (key *rsa.PrivateKey, err error) {
 
 	var (
 		interfaceKey interface{}
@@ -133,12 +133,12 @@ func FromBytes(caCertificate, caKey []byte) (*CA, error) {
 		err error
 	)
 
-	ca.ca, err = ca.CertificateFromPEM(caCertificate)
+	ca.ca, err = CertificateFromPEM(caCertificate)
 	if err != nil {
 		return nil, err
 	}
 
-	ca.caKey, err = ca.PrivateKeyFromPEM(caKey)
+	ca.caKey, err = PrivateKeyFromPEM(caKey)
 	if err != nil {
 		return nil, err
 	}

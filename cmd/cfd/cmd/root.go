@@ -26,13 +26,9 @@ import (
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-var cfgFile string
-var asdfVar string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -44,12 +40,6 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("asdf:", asdfVar)
-		fmt.Println("args:", args)
-	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -63,28 +53,34 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cfd/config.yaml)")
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.Flags().StringVar(&asdfVar, "asdf", "sin configuración", "asdf asdf asdf")
+	rootCmd.PersistentFlags().StringVar(&global.cfgFile, "config", configFileStringDefault, "config file")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
 
-		viper.AddConfigPath(fmt.Sprintf("%s/.cfd", home))
+	// default configuration
+	// viper.SetDefault(configAPIAddr, configAPIAddrDefault)
+	// viper.BindEnv(configAPIAddr, configAPIAddrEnv)
+	// viper.SetDefault(configAPIClient, configAPIClientDefault)
+	// viper.BindEnv(configAPIClient, configAPIClientEnv)
+	// viper.SetDefault(configAPILog, configAPILogDefault)
+	// viper.BindEnv(configAPILog, configAPILogEnv)
+	// viper.SetDefault(configAPITLSCaCert, configAPITLSCaCertDefault)
+	// viper.BindEnv(configAPITLSCaCert, configAPITLSCaCertEnv)
+	// viper.SetDefault(configAPITLSCert, configAPITLSCertDefault)
+	// viper.BindEnv(configAPITLSCert, configAPITLSCertEnv)
+	// viper.SetDefault(configAPITLSKey, configAPITLSKeyDefault)
+	// viper.BindEnv(configAPITLSKey, configAPITLSKeyEnv)
+
+	if global.cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(global.cfgFile)
+	} else {
+		viper.AddConfigPath(pathFromHome(".cfd"))
 		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
-
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -92,5 +88,12 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+func er(err error) {
+	if err != nil {
+		fmt.Printf("err: %T \n%s\n", err, err.Error())
+		os.Exit(1)
 	}
 }
