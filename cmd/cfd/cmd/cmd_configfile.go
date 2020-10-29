@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -24,7 +25,10 @@ func init() {
 func configFunc(cmd *cobra.Command, args []string) {
 
 	// create directory
-	fmt.Println(viper.GetString(configDBConnectionString))
-	er(viper.SafeWriteConfigAs(global.cfgFile))
+	if _, err := os.Stat(filepath.Dir(global.cfgFile)); os.IsNotExist(err) {
+		er(os.MkdirAll(filepath.Dir(global.cfgFile), 0750))
+	}
+
+	er(viper.WriteConfigAs(global.cfgFile))
 
 }

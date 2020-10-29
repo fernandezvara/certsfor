@@ -14,7 +14,7 @@ func init() {
 	store.Register("badger", &Driver{})
 }
 
-// Driver initializes a Firestore and returns it
+// Driver initializes a Badger struct and returns it
 type Driver struct {
 }
 

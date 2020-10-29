@@ -1,27 +1,39 @@
 package manager
 
 import (
-	"crypto/x509/pkix"
 	"testing"
 
+	"github.com/fernandezvara/certsfor/internal/structs"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewCA(t *testing.T) {
 
-	o, c, p, l, s, pc, cn := "This is a test", "ES", "province", "locality", "streetaddress", "12345", "common name"
-
-	name := pkix.Name{
-		Organization:  []string{o},
-		Country:       []string{c},
-		Province:      []string{p},
-		Locality:      []string{l},
-		StreetAddress: []string{s},
-		PostalCode:    []string{pc},
-		CommonName:    cn,
+	request := structs.APICertificateRequest{
+		CN:             "this is a test",
+		C:              "ES",
+		P:              "province",
+		L:              "locality",
+		ST:             "street",
+		PC:             "postalCode",
+		ExpirationDays: 90,
+		Key:            structs.RSA4096,
 	}
 
-	newCA, certFile, keyFile, err := New(name, 0, 3, 0)
+	// o, c, p, l, s, pc, cn := "This is a test", "ES", "province", "locality", "streetaddress", "12345", "common name"
+
+	// name := pkix.Name{
+	// 	Organization:  []string{o},
+	// 	Country:       []string{c},
+	// 	Province:      []string{p},
+	// 	Locality:      []string{l},
+	// 	StreetAddress: []string{s},
+	// 	PostalCode:    []string{pc},
+	// 	CommonName:    cn,
+	// }
+
+	// newCA, certFile, keyFile, err := New(name, 0, 3, 0)
+	newCA, certFile, keyFile, err := New(request)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, newCA)
@@ -30,7 +42,7 @@ func TestNewCA(t *testing.T) {
 
 	assert.True(t, newCA.ca.IsCA)
 
-	assert.Equal(t, newCA.ca.Subject.CommonName, cn)
+	assert.Equal(t, newCA.ca.Subject.CommonName, request.CN)
 
 	assert.Len(t, newCA.ca.Subject.Organization, 1)
 	assert.Len(t, newCA.ca.Subject.Country, 1)
@@ -39,14 +51,14 @@ func TestNewCA(t *testing.T) {
 	assert.Len(t, newCA.ca.Subject.StreetAddress, 1)
 	assert.Len(t, newCA.ca.Subject.PostalCode, 1)
 
-	assert.Equal(t, newCA.ca.Subject.Organization[0], o)
-	assert.Equal(t, newCA.ca.Subject.Country[0], c)
-	assert.Equal(t, newCA.ca.Subject.Province[0], p)
-	assert.Equal(t, newCA.ca.Subject.Locality[0], l)
-	assert.Equal(t, newCA.ca.Subject.StreetAddress[0], s)
-	assert.Equal(t, newCA.ca.Subject.PostalCode[0], pc)
+	assert.Equal(t, newCA.ca.Subject.Organization[0], request.O)
+	assert.Equal(t, newCA.ca.Subject.Country[0], request.C)
+	assert.Equal(t, newCA.ca.Subject.Province[0], request.P)
+	assert.Equal(t, newCA.ca.Subject.Locality[0], request.L)
+	assert.Equal(t, newCA.ca.Subject.StreetAddress[0], request.ST)
+	assert.Equal(t, newCA.ca.Subject.PostalCode[0], request.PC)
 
-	assert.Len(t, certFile, 2130)
+	assert.Len(t, certFile, 2126)
 	assert.GreaterOrEqual(t, len(keyFile), 3243) // BASE64 of key + header + footer is 3243 to 3247 bytes
 	assert.LessOrEqual(t, len(keyFile), 3247)
 
@@ -58,7 +70,7 @@ func TestNewCA(t *testing.T) {
 
 	assert.True(t, newCA2.ca.IsCA)
 
-	assert.Equal(t, newCA2.ca.Subject.CommonName, cn)
+	assert.Equal(t, newCA2.ca.Subject.CommonName, request.CN)
 
 	assert.Len(t, newCA2.ca.Subject.Organization, 1)
 	assert.Len(t, newCA2.ca.Subject.Country, 1)
@@ -67,13 +79,31 @@ func TestNewCA(t *testing.T) {
 	assert.Len(t, newCA2.ca.Subject.StreetAddress, 1)
 	assert.Len(t, newCA2.ca.Subject.PostalCode, 1)
 
-	assert.Equal(t, newCA2.ca.Subject.Organization[0], o)
-	assert.Equal(t, newCA2.ca.Subject.Country[0], c)
-	assert.Equal(t, newCA2.ca.Subject.Province[0], p)
-	assert.Equal(t, newCA2.ca.Subject.Locality[0], l)
-	assert.Equal(t, newCA2.ca.Subject.StreetAddress[0], s)
-	assert.Equal(t, newCA2.ca.Subject.PostalCode[0], pc)
+	assert.Equal(t, newCA2.ca.Subject.Organization[0], request.O)
+	assert.Equal(t, newCA2.ca.Subject.Country[0], request.C)
+	assert.Equal(t, newCA2.ca.Subject.Province[0], request.P)
+	assert.Equal(t, newCA2.ca.Subject.Locality[0], request.L)
+	assert.Equal(t, newCA2.ca.Subject.StreetAddress[0], request.ST)
+	assert.Equal(t, newCA2.ca.Subject.PostalCode[0], request.PC)
 
+}
+
+func TestCertificateWithoutCommonName(t *testing.T) {
+
+	// name := pkix.Name{}
+
+	// newCA, certFile, keyFile, err := New(name, 0, 3, 0)
+
+	request := structs.APICertificateRequest{
+		ExpirationDays: 90,
+		Key:            structs.RSA4096,
+	}
+
+	newCA, certFile, keyFile, err := New(request)
+	assert.Error(t, err, ErrCommonNameBlank)
+	assert.Nil(t, newCA)
+	assert.Len(t, certFile, 0)
+	assert.Len(t, keyFile, 0)
 }
 
 func TestUnparseableFiles(t *testing.T) {

@@ -11,4 +11,6 @@ const (
 // Errors
 var (
 	ErrUnparseableFile = errors.New("unparseable file")
+	ErrCommonNameBlank = errors.New("common name cannot be blank")
+	ErrCAKeyInvalid    = errors.New("ca key has invalid type")
 )

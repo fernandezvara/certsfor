@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"crypto/x509"
-	"crypto/x509/pkix"
 
 	"github.com/fernandezvara/certsfor/internal/structs"
 	"github.com/fernandezvara/certsfor/pkg/client"
@@ -16,7 +15,7 @@ import (
 // Service is the struct used for every request
 type Service struct {
 	store  store.Store
-	client client.Client
+	client *client.Client
 	server bool
 }
 
@@ -29,17 +28,22 @@ func NewAsServer(store store.Store) *Service {
 }
 
 // NewAsClient creates a Server instance that requires a remote server to operate
-func NewAsClient(client client.Client) *Service {
+func NewAsClient(client *client.Client) *Service {
 	return &Service{
 		client: client,
 	}
 }
 
+// Close the store service in a proper way
+func (s *Service) Close() error {
+	return s.store.Close()
+}
+
 // CACreate is responsible of create a new CA struct with its certificate returning its information
-func (s *Service) CACreate(ctx context.Context, subject pkix.Name, years int, months int, days int) (*manager.CA, string, []byte, []byte, error) {
+func (s *Service) CACreate(ctx context.Context, request structs.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
 
 	if s.server {
-		return s.caCreateServer(ctx, subject, years, months, days)
+		return s.caCreateServer(ctx, request)
 	}
 
 	// TODO: call api!
@@ -47,7 +51,7 @@ func (s *Service) CACreate(ctx context.Context, subject pkix.Name, years int, mo
 
 }
 
-func (s *Service) caCreateServer(ctx context.Context, subject pkix.Name, years int, months int, days int) (*manager.CA, string, []byte, []byte, error) {
+func (s *Service) caCreateServer(ctx context.Context, request structs.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
 
 	var (
 		c           *manager.CA
@@ -58,7 +62,7 @@ func (s *Service) caCreateServer(ctx context.Context, subject pkix.Name, years i
 		err         error
 	)
 
-	c, cert, key, err = manager.New(subject, years, months, days)
+	c, cert, key, err = manager.New(request)
 	if err != nil {
 		return nil, "", []byte{}, []byte{}, err
 	}

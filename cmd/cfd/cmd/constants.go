@@ -19,14 +19,13 @@ func init() {
 
 	var err error
 	global.home, err = homedir.Dir()
-	fmt.Println("global:", global)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	configFileStringDefault = pathFromHome(".cfd", "config.yaml")
-	configDBConnectionStringDefault = pathFromHome(".cfd", "cfd.db")
+	configDBConnectionStringDefault = pathFromHome(".cfd", "db")
 
 }
 
@@ -51,21 +50,30 @@ var (
 	// configFileStringDefault = pathFromHome(".cfd", "config.yaml")
 
 	// database config
-	configDBEnable                  = "db.type"
-	configDBEnableEnv               = "CFD_DB_TYPE"
-	configDBEnableDefault           = "badger"
+	configDBType                    = "db.type"
+	configDBTypeEnv                 = "CFD_DB_TYPE"
+	configDBTypeDefault             = "badger"
 	configDBConnectionString        = "db.connection"
 	configDBConnectionStringEnv     = "CFD_DB_CONNECTION"
 	configDBConnectionStringDefault string
 	//configDBConnectionStringDefault = pathFromHome(".cfd", "db")
 
 	// api config
-	configAPIEnable        = "api.enabled"
-	configAPIEnableEnv     = "CFD_API_ENABLED"
-	configAPIEnableDefault = false
-	configAPIAddr          = "api.addr"
-	configAPIAddrEnv       = "CFD_API_ADDR"
-	configAPIAddrDefault   = "127.0.0.1:8080"
+	configAPIEnabled            = "api.enabled"
+	configAPIEnabledEnv         = "CFD_API_ENABLED"
+	configAPIEnabledDefault     = false
+	configAPIAddr               = "api.addr"
+	configAPIAddrEnv            = "CFD_API_ADDR"
+	configAPIAddrDefault        = "127.0.0.1:8080"
+	configAPICA                 = "api.tls.ca"
+	configAPICAEnv              = "CFD_API_CA"
+	configAPICADefault          = ""
+	configAPICertificate        = "api.tls.certificate"
+	configAPICertificateEnv     = "CFD_API_ADDR"
+	configAPICertificateDefault = ""
+	configAPIKey                = "api.tls.key"
+	configAPIKeyEnv             = "CFD_API_ADDR"
+	configAPIKeyDefault         = ""
 
 	// Configuration contents
 	configAPIClient        = "api.client"

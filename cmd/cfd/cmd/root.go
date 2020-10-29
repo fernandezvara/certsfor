@@ -61,6 +61,26 @@ func init() {
 func initConfig() {
 
 	// default configuration
+	// db
+	viper.SetDefault(configDBType, configDBTypeDefault)
+	viper.BindEnv(configDBType, configDBTypeEnv)
+	viper.SetDefault(configDBConnectionString, configDBConnectionStringDefault)
+	viper.BindEnv(configDBConnectionString, configDBConnectionStringEnv)
+	// api
+	viper.SetDefault(configAPIEnabled, configAPIEnabledDefault)
+	viper.BindEnv(configAPIEnabled, configAPIEnabledEnv)
+	viper.SetDefault(configAPIAddr, configAPIAddrDefault)
+	viper.BindEnv(configAPIAddr, configAPIAddrEnv)
+	viper.SetDefault(configAPICA, configAPICADefault)
+	viper.BindEnv(configAPICA, configAPICAEnv)
+	viper.SetDefault(configAPICertificate, configAPICertificateDefault)
+	viper.BindEnv(configAPICertificate, configAPICertificateEnv)
+	viper.SetDefault(configAPIKey, configAPIKeyDefault)
+	viper.BindEnv(configAPIKey, configAPIKeyEnv)
+
+	// viper.SetDefault(config, configDefault)
+	// viper.BindEnv(config, configEnv)
+
 	// viper.SetDefault(configAPIAddr, configAPIAddrDefault)
 	// viper.BindEnv(configAPIAddr, configAPIAddrEnv)
 	// viper.SetDefault(configAPIClient, configAPIClientDefault)
