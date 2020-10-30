@@ -10,8 +10,11 @@ import (
 
 // global variables
 type globalConfig struct {
-	home    string
-	cfgFile string
+	home     string // $HOME
+	cfgFile  string // configuration file location
+	filename string // file to parse/store/execute the action
+	certFile string // certificate file location
+	keyFile  string // key file location
 }
 
 // detect home folder

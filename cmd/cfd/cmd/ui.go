@@ -2,13 +2,15 @@ package cmd
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/manifoldco/promptui"
 )
 
 // errors
 var (
-	errEmptyString = errors.New("empty string")
+	errRequired   = errors.New("required")
+	errNotInteger = errors.New("not an integer")
 )
 
 // promptText formats a prompt and returns its result
@@ -84,11 +86,62 @@ func promptTrueFalseBool(promptLabel, trueString, falseString string, defaultVal
 
 }
 
-// ValidationNotEmptyString validates the string is not empty
-func validationNotEmptyString(input string) error {
+// retuns a selector of `items`
+// selectios are 'text to show' string array
+// values are 'text to return'
+//
+// defaultValue is the position on the map/array that will appear as selected
+func promptSelection(promptLabel string, items, values []string, defaultValue int) (result string, err error) {
+
+	var (
+		selected string
+	)
+
+	prompt := promptui.Select{
+		Label:     promptLabel,
+		Items:     items,
+		CursorPos: defaultValue,
+	}
+
+	_, selected, err = prompt.Run()
+	if err != nil {
+		return
+	}
+
+	result = values[getPositionOnSlice(selected, items)]
+
+	return
+
+}
+
+func getPositionOnSlice(item string, items []string) int {
+
+	for idx, i := range items {
+		if i == item {
+			return idx
+		}
+	}
+
+	return -1
+
+}
+
+// validationRequired validates the string is not empty
+func validationRequired(input string) error {
 
 	if input == "" {
-		return errEmptyString
+		return errRequired
+	}
+
+	return nil
+
+}
+
+// validationInteger validates the string is not empty
+func validationInteger(input string) error {
+
+	if _, err := strconv.ParseUint(input, 10, 64); err != nil {
+		return errNotInteger
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/fernandezvara/certsfor/internal/structs"
@@ -9,30 +10,20 @@ import (
 
 func TestNewCA(t *testing.T) {
 
-	request := structs.APICertificateRequest{
-		CN:             "this is a test",
-		C:              "ES",
-		P:              "province",
-		L:              "locality",
-		ST:             "street",
-		PC:             "postalCode",
-		ExpirationDays: 90,
-		Key:            structs.RSA4096,
-	}
+	var request structs.APICertificateRequest
 
-	// o, c, p, l, s, pc, cn := "This is a test", "ES", "province", "locality", "streetaddress", "12345", "common name"
+	request.DN.CN = "this is a test"
+	request.DN.C = "ES"
+	request.DN.L = "locality"
+	request.DN.O = "organization"
+	request.DN.OU = "ourganization unit"
+	request.DN.P = "province"
+	request.DN.PC = "postalCode"
+	request.DN.ST = "" // empty, ensure does not adds a address
 
-	// name := pkix.Name{
-	// 	Organization:  []string{o},
-	// 	Country:       []string{c},
-	// 	Province:      []string{p},
-	// 	Locality:      []string{l},
-	// 	StreetAddress: []string{s},
-	// 	PostalCode:    []string{pc},
-	// 	CommonName:    cn,
-	// }
+	request.ExpirationDays = 90
+	request.Key = structs.RSA4096
 
-	// newCA, certFile, keyFile, err := New(name, 0, 3, 0)
 	newCA, certFile, keyFile, err := New(request)
 
 	assert.Nil(t, err)
@@ -42,25 +33,22 @@ func TestNewCA(t *testing.T) {
 
 	assert.True(t, newCA.ca.IsCA)
 
-	assert.Equal(t, newCA.ca.Subject.CommonName, request.CN)
+	assert.Equal(t, newCA.ca.Subject.CommonName, request.DN.CN)
 
-	assert.Len(t, newCA.ca.Subject.Organization, 1)
 	assert.Len(t, newCA.ca.Subject.Country, 1)
-	assert.Len(t, newCA.ca.Subject.Province, 1)
 	assert.Len(t, newCA.ca.Subject.Locality, 1)
-	assert.Len(t, newCA.ca.Subject.StreetAddress, 1)
+	assert.Len(t, newCA.ca.Subject.Organization, 1)
+	assert.Len(t, newCA.ca.Subject.OrganizationalUnit, 1)
+	assert.Len(t, newCA.ca.Subject.Province, 1)
 	assert.Len(t, newCA.ca.Subject.PostalCode, 1)
+	assert.Len(t, newCA.ca.Subject.StreetAddress, 0)
 
-	assert.Equal(t, newCA.ca.Subject.Organization[0], request.O)
-	assert.Equal(t, newCA.ca.Subject.Country[0], request.C)
-	assert.Equal(t, newCA.ca.Subject.Province[0], request.P)
-	assert.Equal(t, newCA.ca.Subject.Locality[0], request.L)
-	assert.Equal(t, newCA.ca.Subject.StreetAddress[0], request.ST)
-	assert.Equal(t, newCA.ca.Subject.PostalCode[0], request.PC)
-
-	assert.Len(t, certFile, 2126)
-	assert.GreaterOrEqual(t, len(keyFile), 3243) // BASE64 of key + header + footer is 3243 to 3247 bytes
-	assert.LessOrEqual(t, len(keyFile), 3247)
+	assert.Equal(t, newCA.ca.Subject.Country[0], request.DN.C)
+	assert.Equal(t, newCA.ca.Subject.Locality[0], request.DN.L)
+	assert.Equal(t, newCA.ca.Subject.Organization[0], request.DN.O)
+	assert.Equal(t, newCA.ca.Subject.OrganizationalUnit[0], request.DN.OU)
+	assert.Equal(t, newCA.ca.Subject.Province[0], request.DN.P)
+	assert.Equal(t, newCA.ca.Subject.PostalCode[0], request.DN.PC)
 
 	newCA2, err := FromBytes(certFile, keyFile)
 	assert.Nil(t, err)
@@ -70,29 +58,24 @@ func TestNewCA(t *testing.T) {
 
 	assert.True(t, newCA2.ca.IsCA)
 
-	assert.Equal(t, newCA2.ca.Subject.CommonName, request.CN)
+	assert.Equal(t, newCA2.ca.Subject.CommonName, request.DN.CN)
 
 	assert.Len(t, newCA2.ca.Subject.Organization, 1)
 	assert.Len(t, newCA2.ca.Subject.Country, 1)
 	assert.Len(t, newCA2.ca.Subject.Province, 1)
 	assert.Len(t, newCA2.ca.Subject.Locality, 1)
-	assert.Len(t, newCA2.ca.Subject.StreetAddress, 1)
+	assert.Len(t, newCA2.ca.Subject.StreetAddress, 0)
 	assert.Len(t, newCA2.ca.Subject.PostalCode, 1)
 
-	assert.Equal(t, newCA2.ca.Subject.Organization[0], request.O)
-	assert.Equal(t, newCA2.ca.Subject.Country[0], request.C)
-	assert.Equal(t, newCA2.ca.Subject.Province[0], request.P)
-	assert.Equal(t, newCA2.ca.Subject.Locality[0], request.L)
-	assert.Equal(t, newCA2.ca.Subject.StreetAddress[0], request.ST)
-	assert.Equal(t, newCA2.ca.Subject.PostalCode[0], request.PC)
+	assert.Equal(t, newCA2.ca.Subject.Organization[0], request.DN.O)
+	assert.Equal(t, newCA2.ca.Subject.Country[0], request.DN.C)
+	assert.Equal(t, newCA2.ca.Subject.Province[0], request.DN.P)
+	assert.Equal(t, newCA2.ca.Subject.Locality[0], request.DN.L)
+	assert.Equal(t, newCA2.ca.Subject.PostalCode[0], request.DN.PC)
 
 }
 
 func TestCertificateWithoutCommonName(t *testing.T) {
-
-	// name := pkix.Name{}
-
-	// newCA, certFile, keyFile, err := New(name, 0, 3, 0)
 
 	request := structs.APICertificateRequest{
 		ExpirationDays: 90,
@@ -104,6 +87,41 @@ func TestCertificateWithoutCommonName(t *testing.T) {
 	assert.Nil(t, newCA)
 	assert.Len(t, certFile, 0)
 	assert.Len(t, keyFile, 0)
+}
+
+func TestDifferentKeyTypes(t *testing.T) {
+
+	var request structs.APICertificateRequest
+
+	for _, typ := range []string{structs.RSA2048, structs.RSA3072, structs.RSA4096, structs.ECDSA224, structs.ECDSA256, structs.ECDSA384, structs.ECDSA521} {
+
+		request.DN.CN = "Test"
+		request.ExpirationDays = 90
+		request.Key = typ
+
+		newCA, certFile, keyFile, err := New(request)
+
+		fmt.Println(string(certFile))
+		assert.Nil(t, err)
+		assert.NotNil(t, newCA)
+		assert.IsType(t, &CA{}, newCA)
+		assert.Greater(t, len(certFile), 0)
+		assert.Greater(t, len(keyFile), 0)
+
+	}
+
+	request.DN.CN = "Test"
+	request.DN.ST = "street"
+	request.ExpirationDays = 90
+	request.Key = "invalid"
+
+	newCA, certFile, keyFile, err := New(request)
+
+	assert.Error(t, ErrKeyInvalid, err)
+	assert.Nil(t, newCA)
+	assert.Len(t, certFile, 0)
+	assert.Len(t, keyFile, 0)
+
 }
 
 func TestUnparseableFiles(t *testing.T) {
@@ -143,7 +161,7 @@ LoB5fKNWK4T8JgeuIoedUMzLGm3MBHc0UBNeGzAxom3/utT3tZwM8kiSuo7Ib5he
 qQFRqNH6Dy+hiJYx4fKDJXbrZ0EdXnSkplIch3sTeCIj0kBtSa7SczRsNZxk
 -----END CERTIFICATE-----`
 
-	goodKey := `-----BEGIN RSA PRIVATE KEY-----
+	goodKey := `-----BEGIN PRIVATE KEY-----
 MIIJKQIBAAKCAgEApfwi3ffMS3sVyp4nt4++oon3hC+1tbHbyy7coaI8qBtT++tF
 la06r0aAby+KxMaavqurOBAI+WZSAOhhEmgM2jB1lDHpnO1xTSMYG/4rLJ3yNqnj
 3LAfcJHH8OrlSmkn1+sBNjd/nZtpl3n00CmNffhgHMs9AZC6Sqs9mDj35HTl+Okr
@@ -189,7 +207,7 @@ xcHnFfYxR90NQV670/1EfFtlA9vX4SwwDYNOkIOBNpGblpuZD2rLZYkeydyw9aaN
 N8H1a1/Il+JjZntJA6Mbrhv4t68mOFsaGc8fjbXlxyEkre+uvwuYHdqbRSmrL6Sb
 CHfhA9dl8DNANcflkrfjtte9lIcoP0u4LKi4H8d/PKmNrTUP7UO7Gc6EoqFMGVjI
 nV3Z8XSWsFRPth5prC//U9OnGFAcKy9rHMtGR6vO1BuTdwWsNY+R0LQ1C3JU
------END RSA PRIVATE KEY-----`
+-----END PRIVATE KEY-----`
 
 	badCert := `-----BEGIN CERTIFICATE-----
 MIIF+TCCA+GgAwIBAgIIFj/oIAfys1AwDQYJKoZIhvcNAQELBQAwgYoxCzAJBgNV

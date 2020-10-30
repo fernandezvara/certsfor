@@ -7,8 +7,10 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha1"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/asn1"
 	"encoding/pem"
 	"math/big"
 	"time"
@@ -28,62 +30,39 @@ func newSerial() *big.Int {
 
 }
 
-// // New creates a new CA struct ready to use
-// func New(subject pkix.Name, years, months, days int) (*CA, []byte, []byte, error) {
-
-// 	var (
-// 		ca            CA
-// 		caCert, caKey []byte
-// 		err           error
-// 	)
-
-// 	ca.ca = &x509.Certificate{
-// 		SerialNumber:          newSerial(),
-// 		Subject:               subject,
-// 		NotBefore:             time.Now(),
-// 		NotAfter:              time.Now().AddDate(years, months, days),
-// 		IsCA:                  true,
-// 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-// 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-// 		BasicConstraintsValid: true,
-// 	}
-
-// 	// first we need to create the new key that will be used for create any certificates, also this one
-// 	ca.caKey, err = rsa.GenerateKey(rand.Reader, 4096)
-// 	if err != nil {
-// 		return nil, []byte{}, []byte{}, err
-// 	}
-
-// 	caCert, caKey, err = ca.CreateCertificate(ca.ca)
-
-// 	return &ca, caCert, caKey, err
-
-// }
-
-func apiTox509Certificate(request structs.APICertificateRequest) *x509.Certificate {
+func apiTox509Certificate(request structs.APICertificateRequest) (*x509.Certificate, crypto.PrivateKey, error) {
 
 	var (
 		cert    x509.Certificate
+		key     crypto.PrivateKey
 		subject pkix.Name
+		err     error
 	)
 
-	// CN  string   `json:"cn,omitempty"` // common name (required)
-	// C   string   `json:"c,omitempty"`  // country
-	// L   string   `json:"l,omitempty"`  // locality
-	// O   string   `json:"o,omitempty"`  // organization
-	// OU  string   `json:"ou,omitempty"` // organization unit
-	// P   string   `json:"p,omitempty"`  // province
-	// PC  string   `json:"pc,omitempty"` // postal code
-	// ST  string   `json:"st,omitempty"` // street
+	subject.CommonName = request.DN.CN
 
-	subject.CommonName = request.CN
-	subject.Country = append(subject.Country, request.C)
-	subject.Locality = append(subject.Locality, request.L)
-	subject.Organization = append(subject.Organization, request.O)
-	subject.OrganizationalUnit = append(subject.OrganizationalUnit, request.OU)
-	subject.Province = append(subject.Province, request.P)
-	subject.PostalCode = append(subject.PostalCode, request.PC)
-	subject.StreetAddress = append(subject.StreetAddress, request.ST)
+	if request.DN.C != "" {
+		subject.Country = append(subject.Country, request.DN.C)
+	}
+
+	if request.DN.L != "" {
+		subject.Locality = append(subject.Locality, request.DN.L)
+	}
+	if request.DN.O != "" {
+		subject.Organization = append(subject.Organization, request.DN.O)
+	}
+	if request.DN.OU != "" {
+		subject.OrganizationalUnit = append(subject.OrganizationalUnit, request.DN.OU)
+	}
+	if request.DN.P != "" {
+		subject.Province = append(subject.Province, request.DN.P)
+	}
+	if request.DN.PC != "" {
+		subject.PostalCode = append(subject.PostalCode, request.DN.PC)
+	}
+	if request.DN.ST != "" {
+		subject.StreetAddress = append(subject.StreetAddress, request.DN.ST)
+	}
 
 	cert = x509.Certificate{
 		SerialNumber: newSerial(),
@@ -92,7 +71,28 @@ func apiTox509Certificate(request structs.APICertificateRequest) *x509.Certifica
 		NotAfter:     time.Now().Add(time.Duration(request.ExpirationDays*24) * time.Hour),
 	}
 
-	return &cert
+	// first we need to create the new key that will be used for create any certificates
+	switch request.Key {
+	case structs.RSA2048:
+		key, err = rsa.GenerateKey(rand.Reader, 2048)
+	case structs.RSA3072:
+		key, err = rsa.GenerateKey(rand.Reader, 3072)
+	case structs.RSA4096:
+		key, err = rsa.GenerateKey(rand.Reader, 4096)
+	case structs.ECDSA224:
+		key, err = ecdsa.GenerateKey(elliptic.P224(), rand.Reader)
+	case structs.ECDSA256:
+		key, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	case structs.ECDSA384:
+		key, err = ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	case structs.ECDSA521:
+		key, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
+	default:
+		err = ErrKeyInvalid
+		return nil, nil, err
+	}
+
+	return &cert, key, err
 
 }
 
@@ -105,31 +105,31 @@ func New(request structs.APICertificateRequest) (*CA, []byte, []byte, error) {
 		err           error
 	)
 
-	ca.ca = apiTox509Certificate(request)
+	ca.ca, ca.caKey, err = apiTox509Certificate(request)
+	if err != nil {
+		return nil, []byte{}, []byte{}, err
+	}
+
 	ca.ca.IsCA = true
 	ca.ca.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth}
 	ca.ca.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign
 	ca.ca.BasicConstraintsValid = true
+	ca.ca.MaxPathLenZero = true
 
-	// first we need to create the new key that will be used for create any certificates, also this one
-
-	switch request.Key {
-	case structs.RSA2048:
-		ca.caKey, err = rsa.GenerateKey(rand.Reader, 2048)
-	case structs.RSA4096:
-		ca.caKey, err = rsa.GenerateKey(rand.Reader, 4096)
-	case structs.ECDSA224:
-		ca.caKey, err = ecdsa.GenerateKey(elliptic.P224(), rand.Reader)
-	case structs.ECDSA256:
-		ca.caKey, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	case structs.ECDSA384:
-		ca.caKey, err = ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-	case structs.ECDSA521:
-		ca.caKey, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
-	}
+	spkiASN1, err := x509.MarshalPKIXPublicKey(ca.caKey.(crypto.Signer).Public())
 	if err != nil {
 		return nil, []byte{}, []byte{}, err
 	}
+
+	var spki struct {
+		Algorithm        pkix.AlgorithmIdentifier
+		SubjectPublicKey asn1.BitString
+	}
+	_, err = asn1.Unmarshal(spkiASN1, &spki)
+
+	skid := sha1.Sum(spki.SubjectPublicKey.Bytes)
+
+	ca.ca.SubjectKeyId = skid[:]
 
 	caCert, caKey, err = ca.CreateCertificate(ca.ca)
 	if err != nil {
@@ -159,7 +159,7 @@ func (c *CA) CreateCertificate(request *x509.Certificate) ([]byte, []byte, error
 	case *ecdsa.PrivateKey:
 		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &c.caKey.(*ecdsa.PrivateKey).PublicKey, c.caKey.(*ecdsa.PrivateKey))
 	default:
-		return []byte{}, []byte{}, ErrCAKeyInvalid
+		return []byte{}, []byte{}, ErrKeyInvalid
 	}
 
 	if err != nil {
@@ -167,15 +167,17 @@ func (c *CA) CreateCertificate(request *x509.Certificate) ([]byte, []byte, error
 	}
 
 	certPEM := new(bytes.Buffer)
+
 	pem.Encode(certPEM, &pem.Block{
 		Type:  FileCertificate,
 		Bytes: certBytes,
 	})
 
 	certPrivKeyPEM := new(bytes.Buffer)
+	certPrivKeyBytes, err := x509.MarshalPKCS8PrivateKey(c.caKey)
 	pem.Encode(certPrivKeyPEM, &pem.Block{
-		Type:  FileRSAPrivateKey,
-		Bytes: x509.MarshalPKCS1PrivateKey(c.caKey.(*rsa.PrivateKey)),
+		Type:  FilePrivateKey,
+		Bytes: certPrivKeyBytes,
 	})
 
 	return certPEM.Bytes(), certPrivKeyPEM.Bytes(), nil
@@ -198,7 +200,6 @@ func PrivateKeyFromPEM(keyPEM []byte) (key *rsa.PrivateKey, err error) {
 
 	var (
 		interfaceKey interface{}
-		ok           bool
 	)
 
 	block, _ := pem.Decode(keyPEM)
@@ -207,21 +208,22 @@ func PrivateKeyFromPEM(keyPEM []byte) (key *rsa.PrivateKey, err error) {
 		return
 	}
 
-	if block.Type != FileRSAPrivateKey {
+	if block.Type != FilePrivateKey {
 		err = ErrUnparseableFile
 		return
 	}
 
-	interfaceKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+	interfaceKey, err = x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		err = ErrUnparseableFile
 		return
 	}
 
-	key, ok = interfaceKey.(*rsa.PrivateKey)
-	if !ok {
+	switch interfaceKey.(type) {
+	case *rsa.PrivateKey, *ecdsa.PrivateKey:
+		// ok
+	default:
 		err = ErrUnparseableFile
-		return
 	}
 
 	return
