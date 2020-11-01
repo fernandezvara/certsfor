@@ -5,7 +5,6 @@ import (
 
 	"github.com/fernandezvara/certsfor/db/store"
 	"github.com/fernandezvara/certsfor/internal/manager"
-	"github.com/fernandezvara/certsfor/internal/structs"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
@@ -39,7 +38,7 @@ func (s *Service) Close() error {
 }
 
 // CACreate is responsible of create a new CA struct with its certificate returning its information
-func (s *Service) CACreate(ctx context.Context, request structs.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
+func (s *Service) CACreate(ctx context.Context, request client.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
 
 	if s.server {
 		return s.caCreateServer(ctx, request)
@@ -50,14 +49,14 @@ func (s *Service) CACreate(ctx context.Context, request structs.APICertificateRe
 
 }
 
-func (s *Service) caCreateServer(ctx context.Context, request structs.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
+func (s *Service) caCreateServer(ctx context.Context, request client.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
 
 	var (
 		c           *manager.CA
 		cert        []byte
 		key         []byte
 		id          uuid.UUID
-		certificate structs.Certificate
+		certificate client.Certificate
 		err         error
 	)
 
@@ -87,7 +86,7 @@ func (s *Service) caCreateServer(ctx context.Context, request structs.APICertifi
 func (s *Service) CAGet(collection string) (*manager.CA, error) {
 
 	var (
-		cert structs.Certificate
+		cert client.Certificate
 		err  error
 	)
 
@@ -101,7 +100,7 @@ func (s *Service) CAGet(collection string) (*manager.CA, error) {
 }
 
 // CertificateGet returns the certificate and its key information
-func (s *Service) CertificateGet(ctx context.Context, collection, id string) (structs.Certificate, error) {
+func (s *Service) CertificateGet(ctx context.Context, collection, id string) (client.Certificate, error) {
 
 	if s.server {
 		return s.certificateGetAsServer(ctx, collection, id)
@@ -111,7 +110,7 @@ func (s *Service) CertificateGet(ctx context.Context, collection, id string) (st
 
 }
 
-func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string) (certificate structs.Certificate, err error) {
+func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string) (certificate client.Certificate, err error) {
 
 	err = s.store.Get(ctx, collection, id, &certificate)
 	if err != nil {
@@ -124,7 +123,7 @@ func (s *Service) certificateGetAsServer(ctx context.Context, collection, id str
 
 }
 
-func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string) (certificate structs.Certificate, err error) {
+func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string) (certificate client.Certificate, err error) {
 
 	// TODO!
 	return
@@ -132,7 +131,7 @@ func (s *Service) certificateGetAsClient(ctx context.Context, collection, id str
 }
 
 // CertificateSet creates a new certificate and stores in the store (if server) or POST to the API
-func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection string, info structs.APICertificateRequest) ([]byte, []byte, error) {
+func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection string, info client.APICertificateRequest) ([]byte, []byte, error) {
 
 	if s.server {
 		return s.certificateSetAsServer(ctx, ca, collection, info)
@@ -145,10 +144,10 @@ func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection
 
 // TODO: Make a IsValid for the api request, it must return error if required fields are lost (common name, expirity and key)
 
-func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, collection string, info structs.APICertificateRequest) ([]byte, []byte, error) {
+func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, collection string, info client.APICertificateRequest) ([]byte, []byte, error) {
 
 	var (
-		certificate structs.Certificate
+		certificate client.Certificate
 		err         error
 	)
 
@@ -166,7 +165,7 @@ func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, co
 }
 
 // CertificateList returns an array of certificates and its x509 representation
-func (s *Service) CertificateList(ctx context.Context, collection string) (certificates []structs.Certificate, err error) {
+func (s *Service) CertificateList(ctx context.Context, collection string) (certificates []client.Certificate, err error) {
 
 	if s.server {
 		return s.certificateListAsServer(ctx, collection)
@@ -176,7 +175,7 @@ func (s *Service) CertificateList(ctx context.Context, collection string) (certi
 
 }
 
-func (s *Service) certificateListAsServer(ctx context.Context, collection string) (certificates []structs.Certificate, err error) {
+func (s *Service) certificateListAsServer(ctx context.Context, collection string) (certificates []client.Certificate, err error) {
 
 	var (
 		mapCertificates []map[string]interface{}
@@ -188,7 +187,7 @@ func (s *Service) certificateListAsServer(ctx context.Context, collection string
 	}
 
 	for _, mapCert := range mapCertificates {
-		var certificate structs.Certificate
+		var certificate client.Certificate
 
 		err = mapstructure.Decode(mapCert, &certificate)
 		if err != nil {

@@ -1,3 +1,25 @@
+/*
+Copyright © 2020 @fernandezvara
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
 package cmd
 
 import (
@@ -7,29 +29,29 @@ import (
 	"strconv"
 
 	"github.com/fernandezvara/certsfor/internal/manager"
-	"github.com/fernandezvara/certsfor/internal/structs"
+	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/spf13/viper"
 )
 
-func caTemplate() (request structs.APICertificateRequest) {
+func caTemplate() (request client.APICertificateRequest) {
 
 	request.DN.CN = "ca"
-	request.Key = structs.RSA4096
+	request.Key = client.RSA4096
 	request.ExpirationDays = 365
 	return
 
 }
 
-func certTemplate() (request structs.APICertificateRequest) {
+func certTemplate() (request client.APICertificateRequest) {
 
 	request.DN.CN = "common name"
-	request.Key = structs.RSA4096
+	request.Key = client.RSA4096
 	request.ExpirationDays = 365
 	return
 
 }
 
-func interactiveCertificate(request *structs.APICertificateRequest) {
+func interactiveCertificate(request *client.APICertificateRequest) {
 
 	var (
 		err     error
@@ -69,13 +91,13 @@ func interactiveCertificate(request *structs.APICertificateRequest) {
 		"ECDSA (EC-521)",
 	}
 	values := []string{
-		structs.RSA2048,
-		structs.RSA3072,
-		structs.RSA4096,
-		structs.ECDSA224,
-		structs.ECDSA256,
-		structs.ECDSA384,
-		structs.ECDSA521,
+		client.RSA2048,
+		client.RSA3072,
+		client.RSA4096,
+		client.ECDSA224,
+		client.ECDSA256,
+		client.ECDSA384,
+		client.ECDSA521,
 	}
 
 	request.Key, err = promptSelection("Key Algorithm", items, values, 2)
@@ -106,6 +128,10 @@ func saveFiles(ca *manager.CA, bytesCert, bytesKey []byte) {
 
 	if global.keyFile != "" {
 		er(ioutil.WriteFile(global.keyFile, bytesKey, 0400))
+	}
+
+	if global.bundleFile != "" {
+		er(ioutil.WriteFile(global.keyFile, append(bytesCert, ca.CACertificate()...), 0400))
 	}
 
 }

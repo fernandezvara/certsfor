@@ -6,13 +6,13 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/fernandezvara/certsfor/internal/structs"
+	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewCA(t *testing.T) {
 
-	var request structs.APICertificateRequest
+	var request client.APICertificateRequest
 
 	request.DN.CN = "this is a test"
 	request.DN.C = "ES"
@@ -24,7 +24,7 @@ func TestNewCA(t *testing.T) {
 	request.DN.ST = "" // empty, ensure does not adds a address
 
 	request.ExpirationDays = 90
-	request.Key = structs.RSA4096
+	request.Key = client.RSA4096
 
 	newCA, certFile, keyFile, err := New(request)
 
@@ -79,9 +79,9 @@ func TestNewCA(t *testing.T) {
 
 func TestCertificateWithoutCommonName(t *testing.T) {
 
-	request := structs.APICertificateRequest{
+	request := client.APICertificateRequest{
 		ExpirationDays: 90,
-		Key:            structs.RSA4096,
+		Key:            client.RSA4096,
 	}
 
 	newCA, certFile, keyFile, err := New(request)
@@ -93,9 +93,9 @@ func TestCertificateWithoutCommonName(t *testing.T) {
 
 func TestDifferentKeyTypes(t *testing.T) {
 
-	var request structs.APICertificateRequest
+	var request client.APICertificateRequest
 
-	for _, typ := range []string{structs.RSA2048, structs.RSA3072, structs.RSA4096, structs.ECDSA224, structs.ECDSA256, structs.ECDSA384, structs.ECDSA521} {
+	for _, typ := range []string{client.RSA2048, client.RSA3072, client.RSA4096, client.ECDSA224, client.ECDSA256, client.ECDSA384, client.ECDSA521} {
 
 		request.DN.CN = "Test"
 		request.ExpirationDays = 90
@@ -128,11 +128,11 @@ func TestDifferentKeyTypes(t *testing.T) {
 
 func TestSANs(t *testing.T) {
 
-	var request structs.APICertificateRequest
+	var request client.APICertificateRequest
 
 	request.DN.CN = "Test"
 	request.ExpirationDays = 90
-	request.Key = structs.ECDSA521
+	request.Key = client.ECDSA521
 
 	ip1, ip2 := "192.168.1.1", "123.123.123.123"
 	dns1, dns2 := "*.iswildcard.com", "www.example.com"

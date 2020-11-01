@@ -34,12 +34,10 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "cfd",
 	Short: "certsfor.dev",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `
+'cfd' is a tool for certificate workflow for development environments.
+	
+Full documentation: https://certsfor.dev/`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

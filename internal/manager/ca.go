@@ -17,13 +17,14 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/fernandezvara/certsfor/internal/structs"
+	"github.com/fernandezvara/certsfor/pkg/client"
 )
 
 // CA is the root struct that manages the certificate workflows
 type CA struct {
-	ca    *x509.Certificate
-	caKey crypto.PrivateKey
+	ca               *x509.Certificate
+	caKey            crypto.PrivateKey
+	bytesCertificate []byte
 }
 
 func newSerial() *big.Int {
@@ -32,7 +33,7 @@ func newSerial() *big.Int {
 
 }
 
-func apiTox509Certificate(request structs.APICertificateRequest) (*x509.Certificate, crypto.PrivateKey, error) {
+func apiTox509Certificate(request client.APICertificateRequest) (*x509.Certificate, crypto.PrivateKey, error) {
 
 	var (
 		cert    x509.Certificate
@@ -90,19 +91,19 @@ func apiTox509Certificate(request structs.APICertificateRequest) (*x509.Certific
 
 	// first we need to create the new key that will be used for create any certificates
 	switch request.Key {
-	case structs.RSA2048:
+	case client.RSA2048:
 		key, err = rsa.GenerateKey(rand.Reader, 2048)
-	case structs.RSA3072:
+	case client.RSA3072:
 		key, err = rsa.GenerateKey(rand.Reader, 3072)
-	case structs.RSA4096:
+	case client.RSA4096:
 		key, err = rsa.GenerateKey(rand.Reader, 4096)
-	case structs.ECDSA224:
+	case client.ECDSA224:
 		key, err = ecdsa.GenerateKey(elliptic.P224(), rand.Reader)
-	case structs.ECDSA256:
+	case client.ECDSA256:
 		key, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	case structs.ECDSA384:
+	case client.ECDSA384:
 		key, err = ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-	case structs.ECDSA521:
+	case client.ECDSA521:
 		key, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	default:
 		err = ErrKeyInvalid
@@ -114,7 +115,7 @@ func apiTox509Certificate(request structs.APICertificateRequest) (*x509.Certific
 }
 
 // New creates a new CA struct ready to use
-func New(request structs.APICertificateRequest) (*CA, []byte, []byte, error) {
+func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 
 	var (
 		ca            CA
@@ -153,13 +154,22 @@ func New(request structs.APICertificateRequest) (*CA, []byte, []byte, error) {
 		return nil, []byte{}, []byte{}, err
 	}
 
+	ca.bytesCertificate = caCert
+
 	return &ca, caCert, caKey, err
+
+}
+
+// CACertificate returns the CA certificate []byte
+func (c *CA) CACertificate() []byte {
+
+	return c.bytesCertificate
 
 }
 
 // CreateCertificateFromAPI creates a new certificate from the information passed as request
 // returns the PEM files for the certificate and its key
-func (c *CA) CreateCertificateFromAPI(request structs.APICertificateRequest) ([]byte, []byte, error) {
+func (c *CA) CreateCertificateFromAPI(request client.APICertificateRequest) ([]byte, []byte, error) {
 
 	var (
 		cert *x509.Certificate
@@ -274,6 +284,8 @@ func FromBytes(caCertificate, caKey []byte) (*CA, error) {
 		ca  CA
 		err error
 	)
+
+	ca.bytesCertificate = caCertificate
 
 	ca.ca, err = CertificateFromPEM(caCertificate)
 	if err != nil {
