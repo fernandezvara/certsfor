@@ -73,16 +73,8 @@ func createCertificateFunc(cmd *cobra.Command, args []string) {
 	bytesCert, bytesKey, err = srv.CertificateSet(ctx, ca, collection, request)
 	er(err)
 
-	if global.certFile != "" {
-		er(ioutil.WriteFile(global.certFile, bytesCert, 0400))
-	}
-
-	if global.keyFile != "" {
-		er(ioutil.WriteFile(global.keyFile, bytesKey, 0400))
-	}
+	saveFiles(ca, bytesCert, bytesKey)
 
 	fmt.Println("\n\nCertificate Created.")
 
 }
-
-// puedo hablar porque me dice que esta mal porque esta en ingles

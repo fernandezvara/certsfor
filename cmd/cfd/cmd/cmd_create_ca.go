@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/internal/structs"
 	"github.com/spf13/cobra"
@@ -35,6 +36,7 @@ func createCaFunc(cmd *cobra.Command, args []string) {
 	var (
 		srv        *service.Service
 		request    structs.APICertificateRequest
+		ca         *manager.CA
 		id         string
 		bytesCert  []byte
 		bytesKey   []byte
@@ -61,16 +63,10 @@ func createCaFunc(cmd *cobra.Command, args []string) {
 		interactiveCertificate(&request)
 	}
 
-	_, id, bytesCert, bytesKey, err = srv.CACreate(ctx, request)
+	ca, id, bytesCert, bytesKey, err = srv.CACreate(ctx, request)
 	er(err)
 
-	if global.certFile != "" {
-		er(ioutil.WriteFile(global.certFile, bytesCert, 0400))
-	}
-
-	if global.keyFile != "" {
-		er(ioutil.WriteFile(global.keyFile, bytesKey, 0400))
-	}
+	saveFiles(ca, bytesCert, bytesKey)
 
 	fmt.Printf("\n\nCA Created. ID: '%s'\n", id)
 

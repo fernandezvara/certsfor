@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
 
+	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/structs"
 	"github.com/spf13/viper"
 )
@@ -94,4 +96,16 @@ func collectionOrExit() (collection string) {
 	}
 
 	return
+}
+
+func saveFiles(ca *manager.CA, bytesCert, bytesKey []byte) {
+
+	if global.certFile != "" {
+		er(ioutil.WriteFile(global.certFile, bytesCert, 0400))
+	}
+
+	if global.keyFile != "" {
+		er(ioutil.WriteFile(global.keyFile, bytesKey, 0400))
+	}
+
 }
