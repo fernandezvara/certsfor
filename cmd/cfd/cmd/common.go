@@ -46,7 +46,7 @@ func certTemplate() (request client.APICertificateRequest) {
 
 	request.DN.CN = "common name"
 	request.Key = client.RSA4096
-	request.ExpirationDays = 365
+	request.ExpirationDays = 90
 	return
 
 }

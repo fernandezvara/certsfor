@@ -14,6 +14,7 @@ import (
 	"encoding/pem"
 	"math/big"
 	"net"
+	"net/mail"
 	"net/url"
 	"time"
 
@@ -78,13 +79,18 @@ func apiTox509Certificate(request client.APICertificateRequest) (*x509.Certifica
 		if ip := net.ParseIP(san); ip != nil {
 			cert.IPAddresses = append(cert.IPAddresses, ip)
 		} else {
-			// is uri?
-			u, err := url.Parse(san)
-			if err == nil && u.Scheme != "" && u.Host != "" {
-				cert.URIs = append(cert.URIs, u)
+			email, err := mail.ParseAddress(san)
+			if email != nil && err == nil {
+				cert.EmailAddresses = append(cert.EmailAddresses, san)
 			} else {
-				// then is a DNS name
-				cert.DNSNames = append(cert.DNSNames, san)
+				// is uri?
+				u, err := url.Parse(san)
+				if u.Scheme != "" && u.Host != "" && err == nil {
+					cert.URIs = append(cert.URIs, u)
+				} else {
+					// then is a DNS name
+					cert.DNSNames = append(cert.DNSNames, san)
+				}
 			}
 		}
 	}
@@ -187,7 +193,7 @@ func (c *CA) CreateCertificateFromAPI(request client.APICertificateRequest) ([]b
 	if request.Client {
 		cert.ExtKeyUsage = append(cert.ExtKeyUsage, x509.ExtKeyUsageClientAuth)
 	}
-	if len(cert.IPAddresses)+len(cert.DNSNames)+len(cert.URIs) > 0 {
+	if len(cert.IPAddresses) > 0 || len(cert.DNSNames) > 0 || len(cert.URIs) > 0 {
 		cert.ExtKeyUsage = append(cert.ExtKeyUsage, x509.ExtKeyUsageServerAuth)
 	}
 	if len(cert.EmailAddresses) > 0 {

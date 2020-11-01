@@ -126,7 +126,7 @@ func TestDifferentKeyTypes(t *testing.T) {
 
 }
 
-func TestSANs(t *testing.T) {
+func TestSANsAndAPIrequests(t *testing.T) {
 
 	var request client.APICertificateRequest
 
@@ -165,6 +165,57 @@ func TestSANs(t *testing.T) {
 	assert.Len(t, otherManager.ca.DNSNames, 2)
 	assert.Contains(t, otherManager.ca.DNSNames, dns1)
 	assert.Contains(t, otherManager.ca.DNSNames, dns2)
+
+	assert.Equal(t, certFile, newCA.CACertificate())
+	assert.Equal(t, certFile, otherManager.CACertificate())
+
+	var newRequest client.APICertificateRequest
+
+	newRequest.DN.CN = "Client"
+	newRequest.ExpirationDays = 90
+	newRequest.Key = client.ECDSA521
+	newRequest.Client = true
+
+	certFile, keyFile, err = otherManager.CreateCertificateFromAPI(newRequest)
+	assert.Nil(t, err)
+	assert.Greater(t, len(certFile), 0)
+	assert.Greater(t, len(keyFile), 0)
+
+	var newRequest2 client.APICertificateRequest
+
+	newRequest2.DN.CN = "email"
+	newRequest2.ExpirationDays = 90
+	newRequest2.Key = client.ECDSA521
+	newRequest2.SAN = []string{"email@example.com"}
+
+	certFile, keyFile, err = otherManager.CreateCertificateFromAPI(newRequest2)
+	assert.Nil(t, err)
+	assert.Greater(t, len(certFile), 0)
+	assert.Greater(t, len(keyFile), 0)
+
+	var newRequest3 client.APICertificateRequest
+
+	newRequest3.DN.CN = "site"
+	newRequest3.ExpirationDays = 90
+	newRequest3.Key = client.ECDSA521
+	newRequest3.SAN = []string{"www.example.org"}
+
+	certFile, keyFile, err = otherManager.CreateCertificateFromAPI(newRequest3)
+	assert.Nil(t, err)
+	assert.Greater(t, len(certFile), 0)
+	assert.Greater(t, len(keyFile), 0)
+
+	var newRequest4 client.APICertificateRequest
+
+	newRequest4.DN.CN = "with eror"
+	newRequest4.ExpirationDays = 90
+	newRequest4.Key = "invalid"
+	newRequest4.SAN = []string{"www.example.org"}
+
+	certFile, keyFile, err = otherManager.CreateCertificateFromAPI(newRequest4)
+	assert.Error(t, err)
+	assert.Len(t, certFile, 0)
+	assert.Len(t, keyFile, 0)
 
 }
 
