@@ -2,6 +2,8 @@ package manager
 
 import (
 	"fmt"
+	"net"
+	"net/url"
 	"testing"
 
 	"github.com/fernandezvara/certsfor/internal/structs"
@@ -121,6 +123,48 @@ func TestDifferentKeyTypes(t *testing.T) {
 	assert.Nil(t, newCA)
 	assert.Len(t, certFile, 0)
 	assert.Len(t, keyFile, 0)
+
+}
+
+func TestSANs(t *testing.T) {
+
+	var request structs.APICertificateRequest
+
+	request.DN.CN = "Test"
+	request.ExpirationDays = 90
+	request.Key = structs.ECDSA521
+
+	ip1, ip2 := "192.168.1.1", "123.123.123.123"
+	dns1, dns2 := "*.iswildcard.com", "www.example.com"
+	uri1, uri2 := "https://www.example1.com", "http://isuri.isuri.com"
+	request.SAN = []string{ip1, ip2, dns1, dns2, uri1, uri2}
+
+	newCA, certFile, keyFile, err := New(request)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, newCA)
+	assert.IsType(t, &CA{}, newCA)
+	assert.Greater(t, len(certFile), 0)
+	assert.Greater(t, len(keyFile), 0)
+
+	otherManager, err := FromBytes(certFile, keyFile)
+	assert.Nil(t, err)
+
+	assert.Len(t, otherManager.ca.URIs, 2)
+	u1, err := url.Parse(uri1)
+	assert.Nil(t, err)
+	assert.Contains(t, otherManager.ca.URIs, u1)
+	u2, err := url.Parse(uri2)
+	assert.Nil(t, err)
+	assert.Contains(t, otherManager.ca.URIs, u2)
+
+	assert.Len(t, otherManager.ca.IPAddresses, 2)
+	assert.Equal(t, otherManager.ca.IPAddresses[0].String(), net.ParseIP(ip1).String())
+	assert.Equal(t, otherManager.ca.IPAddresses[1].String(), net.ParseIP(ip2).String())
+
+	assert.Len(t, otherManager.ca.DNSNames, 2)
+	assert.Contains(t, otherManager.ca.DNSNames, dns1)
+	assert.Contains(t, otherManager.ca.DNSNames, dns2)
 
 }
 

@@ -10,11 +10,13 @@ import (
 
 // global variables
 type globalConfig struct {
-	home     string // $HOME
-	cfgFile  string // configuration file location
-	filename string // file to parse/store/execute the action
-	certFile string // certificate file location
-	keyFile  string // key file location
+	home       string // $HOME
+	cfgFile    string // configuration file location
+	filename   string // file to parse/store/execute the action
+	certFile   string // certificate file location
+	keyFile    string // key file location
+	collection string // ca id <-> colelction
+	bool1      bool   // common bool option
 }
 
 // detect home folder
@@ -77,6 +79,11 @@ var (
 	configAPIKey                = "api.tls.key"
 	configAPIKeyEnv             = "CFD_API_ADDR"
 	configAPIKeyDefault         = ""
+
+	// ca id
+	configCAID        = "ca-id"
+	configCAIDEnv     = "CFD_CA_ID"
+	configCAIDDefault = ""
 
 	// Configuration contents
 	configAPIClient        = "api.client"

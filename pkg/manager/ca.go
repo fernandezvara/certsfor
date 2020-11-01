@@ -13,6 +13,8 @@ import (
 	"encoding/asn1"
 	"encoding/pem"
 	"math/big"
+	"net"
+	"net/url"
 	"time"
 
 	"github.com/fernandezvara/certsfor/internal/structs"
@@ -69,6 +71,21 @@ func apiTox509Certificate(request structs.APICertificateRequest) (*x509.Certific
 		Subject:      subject,
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().Add(time.Duration(request.ExpirationDays*24) * time.Hour),
+	}
+
+	for _, san := range request.SAN {
+		if ip := net.ParseIP(san); ip != nil {
+			cert.IPAddresses = append(cert.IPAddresses, ip)
+		} else {
+			// is uri?
+			u, err := url.Parse(san)
+			if err == nil && u.Scheme != "" && u.Host != "" {
+				cert.URIs = append(cert.URIs, u)
+			} else {
+				// then is a DNS name
+				cert.DNSNames = append(cert.DNSNames, san)
+			}
+		}
 	}
 
 	// first we need to create the new key that will be used for create any certificates
@@ -131,7 +148,7 @@ func New(request structs.APICertificateRequest) (*CA, []byte, []byte, error) {
 
 	ca.ca.SubjectKeyId = skid[:]
 
-	caCert, caKey, err = ca.CreateCertificate(ca.ca)
+	caCert, caKey, err = ca.CreateCertificate(ca.ca, ca.caKey)
 	if err != nil {
 		return nil, []byte{}, []byte{}, err
 	}
@@ -140,9 +157,28 @@ func New(request structs.APICertificateRequest) (*CA, []byte, []byte, error) {
 
 }
 
+// CreateCertificateFromAPI creates a new certificate from the information passed as request
+// returns the PEM files for the certificate and its key
+func (c *CA) CreateCertificateFromAPI(request structs.APICertificateRequest) ([]byte, []byte, error) {
+
+	var (
+		cert *x509.Certificate
+		key  crypto.PrivateKey
+		err  error
+	)
+
+	cert, key, err = apiTox509Certificate(request)
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+
+	return c.CreateCertificate(cert, key)
+
+}
+
 // CreateCertificate creates a new certificate from the information passed as request
 // returns the PEM files for the certificate and its key
-func (c *CA) CreateCertificate(request *x509.Certificate) ([]byte, []byte, error) {
+func (c *CA) CreateCertificate(request *x509.Certificate, key crypto.PrivateKey) ([]byte, []byte, error) {
 
 	var (
 		certBytes []byte
@@ -153,11 +189,11 @@ func (c *CA) CreateCertificate(request *x509.Certificate) ([]byte, []byte, error
 		return []byte{}, []byte{}, ErrCommonNameBlank
 	}
 
-	switch c.caKey.(type) {
+	switch key.(type) {
 	case *rsa.PrivateKey:
-		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &c.caKey.(*rsa.PrivateKey).PublicKey, c.caKey.(*rsa.PrivateKey))
+		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &key.(*rsa.PrivateKey).PublicKey, key.(*rsa.PrivateKey))
 	case *ecdsa.PrivateKey:
-		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &c.caKey.(*ecdsa.PrivateKey).PublicKey, c.caKey.(*ecdsa.PrivateKey))
+		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &key.(*ecdsa.PrivateKey).PublicKey, key.(*ecdsa.PrivateKey))
 	default:
 		return []byte{}, []byte{}, ErrKeyInvalid
 	}

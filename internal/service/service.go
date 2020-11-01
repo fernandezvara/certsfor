@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/x509"
 
 	"github.com/fernandezvara/certsfor/internal/structs"
 	"github.com/fernandezvara/certsfor/pkg/client"
@@ -84,10 +83,20 @@ func (s *Service) caCreateServer(ctx context.Context, request structs.APICertifi
 
 }
 
-// CAGet creates a new CA structs from the cert and key bytes
-func (s *Service) CAGet(caCertificate, caKey []byte) (*manager.CA, error) {
+// CAGet creates a new CA struct from the collection ID
+func (s *Service) CAGet(collection string) (*manager.CA, error) {
 
-	return manager.FromBytes(caCertificate, caKey)
+	var (
+		cert structs.Certificate
+		err  error
+	)
+
+	cert, err = s.certificateGetAsServer(context.Background(), collection, "ca")
+	if err != nil {
+		return nil, err
+	}
+
+	return manager.FromBytes(cert.Certificate, cert.Key)
 
 }
 
@@ -123,7 +132,7 @@ func (s *Service) certificateGetAsClient(ctx context.Context, collection, id str
 }
 
 // CertificateSet creates a new certificate and stores in the store (if server) or POST to the API
-func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection string, info *x509.Certificate) ([]byte, []byte, error) {
+func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection string, info structs.APICertificateRequest) ([]byte, []byte, error) {
 
 	if s.server {
 		return s.certificateSetAsServer(ctx, ca, collection, info)
@@ -134,19 +143,21 @@ func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection
 
 }
 
-func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, collection string, info *x509.Certificate) ([]byte, []byte, error) {
+// TODO: Make a IsValid for the api request, it must return error if required fields are lost (common name, expirity and key)
+
+func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, collection string, info structs.APICertificateRequest) ([]byte, []byte, error) {
 
 	var (
 		certificate structs.Certificate
 		err         error
 	)
 
-	certificate.Certificate, certificate.Key, err = ca.CreateCertificate(info)
+	certificate.Certificate, certificate.Key, err = ca.CreateCertificateFromAPI(info)
 	if err != nil {
 		return []byte{}, []byte{}, err
 	}
 
-	err = s.store.Set(ctx, collection, info.Subject.CommonName, certificate)
+	err = s.store.Set(ctx, collection, info.DN.CN, certificate)
 	if err != nil {
 		return []byte{}, []byte{}, err
 	}

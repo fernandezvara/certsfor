@@ -33,6 +33,32 @@ func promptText(promptLabel, promptDefault string, validateFunc promptui.Validat
 
 }
 
+// promptArray will ask for many items and return an array of them when the user return an empty one
+func promptArray(promptLabel string) (items []string, err error) {
+
+	var (
+		prompt promptui.Prompt
+	)
+
+	for {
+		var item string
+		prompt.Label = promptLabel
+		item, err = prompt.Run()
+		if err != nil {
+			return
+		}
+		if item == "" {
+			break
+		}
+
+		items = append(items, item)
+
+	}
+
+	return
+
+}
+
 // promptPassword formats a prompt for password request, returns its result and validation error if any
 func promptPassword(promptLabel string, validateFunc promptui.ValidateFunc) (string, error) {
 

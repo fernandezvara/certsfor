@@ -54,7 +54,6 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&global.cfgFile, "config", configFileStringDefault, "config file")
-	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -77,6 +76,9 @@ func initConfig() {
 	viper.BindEnv(configAPICertificate, configAPICertificateEnv)
 	viper.SetDefault(configAPIKey, configAPIKeyDefault)
 	viper.BindEnv(configAPIKey, configAPIKeyEnv)
+	// ca id
+	viper.SetDefault(configCAID, configCAIDDefault)
+	viper.BindEnv(configCAID, configCAIDEnv)
 
 	// viper.SetDefault(config, configDefault)
 	// viper.BindEnv(config, configEnv)
