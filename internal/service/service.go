@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
+	"github.com/fernandezvara/certsfor/db/store"
+	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/structs"
 	"github.com/fernandezvara/certsfor/pkg/client"
-	"github.com/fernandezvara/certsfor/pkg/manager"
-	"github.com/fernandezvara/certsfor/pkg/store"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 )

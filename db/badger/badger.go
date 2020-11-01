@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/dgraph-io/badger"
-	"github.com/fernandezvara/certsfor/pkg/store"
+	"github.com/fernandezvara/certsfor/db/store"
 )
 
 func init() {
@@ -38,7 +38,7 @@ func (f Driver) Open(ctx context.Context, connection string) (store.Store, error
 
 	store.db, err = badger.Open(opts)
 	if err != nil {
-		fmt.Println("err:database.open:", err)
+		fmt.Println("err:badger.database.open:", err)
 		return nil, err
 	}
 

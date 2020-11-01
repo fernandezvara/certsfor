@@ -6,7 +6,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
-	"github.com/fernandezvara/certsfor/pkg/store"
+	"github.com/fernandezvara/certsfor/db/store"
 	"google.golang.org/api/option"
 )
 

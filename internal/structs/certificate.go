@@ -23,9 +23,10 @@ type APICertificateRequest struct {
 		PC string `json:"pc,omitempty" yaml:"pc"` // postal code
 		ST string `json:"st,omitempty" yaml:"st"` // street
 	} `json:"dn"`
-	SAN            []string `json:"san" yaml:"san"` // SAN
-	Key            string   `json:"key" yaml:"key"` // Key Type (RSA/ECDSA):(complexity)
-	ExpirationDays int64    `json:"exp" yaml:"exp"` // Days the certificate will be valid
+	SAN            []string `json:"san" yaml:"san"`       // SAN
+	Key            string   `json:"key" yaml:"key"`       // Key Type (RSA/ECDSA):(complexity)
+	ExpirationDays int64    `json:"exp" yaml:"exp"`       // Days the certificate will be valid
+	Client         bool     `json:"client" yaml:"client"` // requesting a client certificate?
 }
 
 // key algorithms

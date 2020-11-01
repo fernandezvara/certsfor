@@ -3,11 +3,11 @@ package cmd
 import (
 	"context"
 
+	_ "github.com/fernandezvara/certsfor/db/badger"    // store driver
+	_ "github.com/fernandezvara/certsfor/db/firestore" // store driver
+	"github.com/fernandezvara/certsfor/db/store"
 	"github.com/fernandezvara/certsfor/internal/service"
-	_ "github.com/fernandezvara/certsfor/pkg/badger" // store driver
 	"github.com/fernandezvara/certsfor/pkg/client"
-	_ "github.com/fernandezvara/certsfor/pkg/firestore" // store driver
-	"github.com/fernandezvara/certsfor/pkg/store"
 	"github.com/spf13/viper"
 )
 

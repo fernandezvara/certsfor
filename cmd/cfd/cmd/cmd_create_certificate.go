@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/internal/structs"
-	"github.com/fernandezvara/certsfor/pkg/manager"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -53,7 +53,6 @@ func createCertificateFunc(cmd *cobra.Command, args []string) {
 	collection = collectionOrExit()
 
 	ca, err = srv.CAGet(collection)
-	fmt.Printf("%v\n", ca)
 	er(err)
 
 	// fill from YAML

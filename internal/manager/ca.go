@@ -172,6 +172,18 @@ func (c *CA) CreateCertificateFromAPI(request structs.APICertificateRequest) ([]
 		return []byte{}, []byte{}, err
 	}
 
+	cert.KeyUsage = x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature
+
+	if request.Client {
+		cert.ExtKeyUsage = append(cert.ExtKeyUsage, x509.ExtKeyUsageClientAuth)
+	}
+	if len(cert.IPAddresses)+len(cert.DNSNames)+len(cert.URIs) > 0 {
+		cert.ExtKeyUsage = append(cert.ExtKeyUsage, x509.ExtKeyUsageServerAuth)
+	}
+	if len(cert.EmailAddresses) > 0 {
+		cert.ExtKeyUsage = append(cert.ExtKeyUsage, x509.ExtKeyUsageEmailProtection)
+	}
+
 	return c.CreateCertificate(cert, key)
 
 }
@@ -191,9 +203,9 @@ func (c *CA) CreateCertificate(request *x509.Certificate, key crypto.PrivateKey)
 
 	switch key.(type) {
 	case *rsa.PrivateKey:
-		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &key.(*rsa.PrivateKey).PublicKey, key.(*rsa.PrivateKey))
+		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &key.(*rsa.PrivateKey).PublicKey, c.caKey)
 	case *ecdsa.PrivateKey:
-		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &key.(*ecdsa.PrivateKey).PublicKey, key.(*ecdsa.PrivateKey))
+		certBytes, err = x509.CreateCertificate(rand.Reader, request, c.ca, &key.(*ecdsa.PrivateKey).PublicKey, c.caKey)
 	default:
 		return []byte{}, []byte{}, ErrKeyInvalid
 	}
@@ -210,7 +222,7 @@ func (c *CA) CreateCertificate(request *x509.Certificate, key crypto.PrivateKey)
 	})
 
 	certPrivKeyPEM := new(bytes.Buffer)
-	certPrivKeyBytes, err := x509.MarshalPKCS8PrivateKey(c.caKey)
+	certPrivKeyBytes, err := x509.MarshalPKCS8PrivateKey(key)
 	pem.Encode(certPrivKeyPEM, &pem.Block{
 		Type:  FilePrivateKey,
 		Bytes: certPrivKeyBytes,
@@ -232,11 +244,7 @@ func CertificateFromPEM(certPEM []byte) (cert *x509.Certificate, err error) {
 }
 
 // PrivateKeyFromPEM returns a rsa.PrivateKey from the PEM bytes
-func PrivateKeyFromPEM(keyPEM []byte) (key *rsa.PrivateKey, err error) {
-
-	var (
-		interfaceKey interface{}
-	)
+func PrivateKeyFromPEM(keyPEM []byte) (key crypto.PrivateKey, err error) {
 
 	block, _ := pem.Decode(keyPEM)
 	if block == nil {
@@ -249,17 +257,10 @@ func PrivateKeyFromPEM(keyPEM []byte) (key *rsa.PrivateKey, err error) {
 		return
 	}
 
-	interfaceKey, err = x509.ParsePKCS8PrivateKey(block.Bytes)
+	key, err = x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		err = ErrUnparseableFile
 		return
-	}
-
-	switch interfaceKey.(type) {
-	case *rsa.PrivateKey, *ecdsa.PrivateKey:
-		// ok
-	default:
-		err = ErrUnparseableFile
 	}
 
 	return

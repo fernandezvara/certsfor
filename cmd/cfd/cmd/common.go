@@ -83,7 +83,7 @@ func interactiveCertificate(request *structs.APICertificateRequest) {
 
 func collectionOrExit() (collection string) {
 
-	viper.GetString("ca-id")
+	collection = viper.GetString("ca-id")
 	if global.collection != "" {
 		collection = global.collection
 	}
