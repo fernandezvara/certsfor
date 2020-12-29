@@ -30,7 +30,6 @@ import (
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // getCertificateCmd represents the bootstrap command
@@ -47,7 +46,8 @@ func init() {
 	getCertificateCmd.Flags().StringVarP(&global.bundleFile, "bundle", "b", "", "Bundle file location.")
 	getCertificateCmd.Flags().StringVarP(&global.keyFile, "key", "k", "", "Key file location.")
 	getCertificateCmd.Flags().StringVar(&global.collection, "ca-id", "", "CA Identifier. (required). [$CFD_CA_ID]")
-	getCertificateCmd.Flags().StringVar(&global.collection, "cn", "", "Common Name. (required).")
+	getCertificateCmd.Flags().StringVar(&global.cn, "cn", "", "Common Name. (required).")
+	getCertificateCmd.Flags().Int64Var(&global.remaining, "renew", 20, "Renew the certificate if the remaining lifetime is the selected days or less (defaults to 20). Key remains the same.")
 	getCertificateCmd.MarkFlagRequired("cn")
 }
 
@@ -70,11 +70,11 @@ func getCertificateFunc(cmd *cobra.Command, args []string) {
 	ca, err = srv.CAGet(collection)
 	er(err)
 
-	cert, err = srv.CertificateGet(ctx, collection, viper.GetString("cn"))
+	cert, err = srv.CertificateGet(ctx, collection, global.cn, global.remaining)
 	er(err)
 
 	saveFiles(ca, cert.Certificate, cert.Key)
 
-	fmt.Println("\n\nCertificate Created.")
+	fmt.Println("\n\nCertificate Retrieved.")
 
 }

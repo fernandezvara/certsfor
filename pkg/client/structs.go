@@ -5,9 +5,10 @@ import "crypto/x509"
 // Certificate holds the certificate and key file used to interact with the
 // data store
 type Certificate struct {
-	Key             []byte            `json:"key"`
-	Certificate     []byte            `json:"certificate"`
-	X509Certificate *x509.Certificate `json:"-"`
+	Key             []byte                `json:"key"`
+	Certificate     []byte                `json:"certificate"`
+	X509Certificate *x509.Certificate     `json:"-"`
+	Request         APICertificateRequest `json:"request"`
 }
 
 // APICertificateRequest is the struct with the data needed to create a new
@@ -39,3 +40,8 @@ const (
 	ECDSA384 = "ecdsa:384"
 	ECDSA521 = "ecdsa:521"
 )
+
+// APIStatus is returned by the API on GET /status
+type APIStatus struct {
+	Version string `json:"version"`
+}

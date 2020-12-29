@@ -34,11 +34,11 @@ func newSerial() *big.Int {
 
 }
 
-func apiTox509Certificate(request client.APICertificateRequest) (*x509.Certificate, crypto.PrivateKey, error) {
+// APITox509Certificate creates a x509.Certificate from the API request
+func APITox509Certificate(request client.APICertificateRequest) (*x509.Certificate, error) {
 
 	var (
 		cert    x509.Certificate
-		key     crypto.PrivateKey
 		subject pkix.Name
 		err     error
 	)
@@ -95,6 +95,12 @@ func apiTox509Certificate(request client.APICertificateRequest) (*x509.Certifica
 		}
 	}
 
+	return &cert, err
+
+}
+
+func apiToCryptoKey(request client.APICertificateRequest) (key crypto.PrivateKey, err error) {
+
 	// first we need to create the new key that will be used for create any certificates
 	switch request.Key {
 	case client.RSA2048:
@@ -113,10 +119,9 @@ func apiTox509Certificate(request client.APICertificateRequest) (*x509.Certifica
 		key, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	default:
 		err = ErrKeyInvalid
-		return nil, nil, err
 	}
 
-	return &cert, key, err
+	return
 
 }
 
@@ -129,7 +134,12 @@ func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 		err           error
 	)
 
-	ca.ca, ca.caKey, err = apiTox509Certificate(request)
+	ca.ca, err = APITox509Certificate(request)
+	if err != nil {
+		return nil, []byte{}, []byte{}, err
+	}
+
+	ca.caKey, err = apiToCryptoKey(request)
 	if err != nil {
 		return nil, []byte{}, []byte{}, err
 	}
@@ -183,7 +193,12 @@ func (c *CA) CreateCertificateFromAPI(request client.APICertificateRequest) ([]b
 		err  error
 	)
 
-	cert, key, err = apiTox509Certificate(request)
+	cert, err = APITox509Certificate(request)
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+
+	key, err = apiToCryptoKey(request)
 	if err != nil {
 		return []byte{}, []byte{}, err
 	}
@@ -259,7 +274,7 @@ func CertificateFromPEM(certPEM []byte) (cert *x509.Certificate, err error) {
 
 }
 
-// PrivateKeyFromPEM returns a rsa.PrivateKey from the PEM bytes
+// PrivateKeyFromPEM returns a crypto.PrivateKey (rsa or ecdsa) from the PEM bytes
 func PrivateKeyFromPEM(keyPEM []byte) (key crypto.PrivateKey, err error) {
 
 	block, _ := pem.Decode(keyPEM)

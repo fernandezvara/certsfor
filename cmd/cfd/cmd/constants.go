@@ -39,7 +39,9 @@ type globalConfig struct {
 	bundleFile string // bundle file location
 	keyFile    string // key file location
 	collection string // ca id <-> colelction
-	bool1      bool   // common bool option
+	cn         string
+	bool1      bool  // common bool option
+	remaining  int64 // remaining days (integer) for expiration
 }
 
 // detect home folder
@@ -97,11 +99,23 @@ var (
 	configAPICAEnv              = "CFD_API_CA"
 	configAPICADefault          = ""
 	configAPICertificate        = "api.tls.certificate"
-	configAPICertificateEnv     = "CFD_API_ADDR"
+	configAPICertificateEnv     = "CFD_API_CERT"
 	configAPICertificateDefault = ""
 	configAPIKey                = "api.tls.key"
-	configAPIKeyEnv             = "CFD_API_ADDR"
+	configAPIKeyEnv             = "CFD_API_KEY"
 	configAPIKeyDefault         = ""
+	configWebEnabled            = "api.web"
+	configWebEnabledEnv         = "CFD_WEB_ENABLED"
+	configWebEnabledDefault     = false
+	configAPIAccessLog          = "api.log.access"
+	configAPIAccessLogEnv       = "CFD_LOG_ACCESS"
+	configAPIAccessLogDefault   = []string{"stdout"}
+	configAPIErrorLog           = "api.log.error"
+	configAPIErrorLogEnv        = "CFD_LOG_ERROR"
+	configAPIErrorLogDefault    = []string{"stderr"}
+	configAPIDebugLog           = "api.log.debug"
+	configAPIDebugLogEnv        = "CFD_LOG_DEBUG"
+	configAPIDebugLogDefault    = false
 
 	// ca id
 	configCAID        = "ca-id"

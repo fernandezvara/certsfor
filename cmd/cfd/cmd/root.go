@@ -64,8 +64,6 @@ func initConfig() {
 	viper.SetDefault(configDBConnectionString, configDBConnectionStringDefault)
 	viper.BindEnv(configDBConnectionString, configDBConnectionStringEnv)
 	// api
-	viper.SetDefault(configAPIEnabled, configAPIEnabledDefault)
-	viper.BindEnv(configAPIEnabled, configAPIEnabledEnv)
 	viper.SetDefault(configAPIAddr, configAPIAddrDefault)
 	viper.BindEnv(configAPIAddr, configAPIAddrEnv)
 	viper.SetDefault(configAPICA, configAPICADefault)
@@ -74,25 +72,21 @@ func initConfig() {
 	viper.BindEnv(configAPICertificate, configAPICertificateEnv)
 	viper.SetDefault(configAPIKey, configAPIKeyDefault)
 	viper.BindEnv(configAPIKey, configAPIKeyEnv)
+	viper.SetDefault(configWebEnabled, configWebEnabledDefault)
+	viper.BindEnv(configWebEnabled, configWebEnabledEnv)
+	viper.SetDefault(configAPIAccessLog, configAPIAccessLogDefault)
+	viper.BindEnv(configAPIAccessLog, configAPIAccessLogEnv)
+	viper.SetDefault(configAPIErrorLog, configAPIErrorLogDefault)
+	viper.BindEnv(configAPIErrorLog, configAPIErrorLogEnv)
+	viper.SetDefault(configAPIDebugLog, configAPIDebugLogDefault)
+	viper.BindEnv(configAPIDebugLog, configAPIDebugLogEnv)
+
 	// ca id
 	viper.SetDefault(configCAID, configCAIDDefault)
 	viper.BindEnv(configCAID, configCAIDEnv)
 
 	// viper.SetDefault(config, configDefault)
 	// viper.BindEnv(config, configEnv)
-
-	// viper.SetDefault(configAPIAddr, configAPIAddrDefault)
-	// viper.BindEnv(configAPIAddr, configAPIAddrEnv)
-	// viper.SetDefault(configAPIClient, configAPIClientDefault)
-	// viper.BindEnv(configAPIClient, configAPIClientEnv)
-	// viper.SetDefault(configAPILog, configAPILogDefault)
-	// viper.BindEnv(configAPILog, configAPILogEnv)
-	// viper.SetDefault(configAPITLSCaCert, configAPITLSCaCertDefault)
-	// viper.BindEnv(configAPITLSCaCert, configAPITLSCaCertEnv)
-	// viper.SetDefault(configAPITLSCert, configAPITLSCertDefault)
-	// viper.BindEnv(configAPITLSCert, configAPITLSCertEnv)
-	// viper.SetDefault(configAPITLSKey, configAPITLSKeyDefault)
-	// viper.BindEnv(configAPITLSKey, configAPITLSKeyEnv)
 
 	if global.cfgFile != "" {
 		// Use config file from the flag.

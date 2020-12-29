@@ -93,5 +93,3 @@ func createCaFunc(cmd *cobra.Command, args []string) {
 	fmt.Printf("\n\nCA Created. ID: '%s'\n", id)
 
 }
-
-// puedo hablar porque me dice que esta mal porque esta en ingles

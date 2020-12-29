@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"crypto"
+	"crypto/x509"
+	"time"
 
 	"github.com/fernandezvara/certsfor/db/store"
 	"github.com/fernandezvara/certsfor/internal/manager"
@@ -72,6 +75,7 @@ func (s *Service) caCreateServer(ctx context.Context, request client.APICertific
 
 	certificate.Certificate = cert
 	certificate.Key = key
+	certificate.Request = request
 
 	err = s.store.Set(ctx, id.String(), "ca", certificate)
 	if err != nil {
@@ -90,7 +94,7 @@ func (s *Service) CAGet(collection string) (*manager.CA, error) {
 		err  error
 	)
 
-	cert, err = s.certificateGetAsServer(context.Background(), collection, "ca")
+	cert, err = s.certificateGetAsServer(context.Background(), collection, "ca", 0)
 	if err != nil {
 		return nil, err
 	}
@@ -100,17 +104,17 @@ func (s *Service) CAGet(collection string) (*manager.CA, error) {
 }
 
 // CertificateGet returns the certificate and its key information
-func (s *Service) CertificateGet(ctx context.Context, collection, id string) (client.Certificate, error) {
+func (s *Service) CertificateGet(ctx context.Context, collection, id string, remaining int64) (client.Certificate, error) {
 
 	if s.server {
-		return s.certificateGetAsServer(ctx, collection, id)
+		return s.certificateGetAsServer(ctx, collection, id, remaining)
 	}
 
-	return s.certificateGetAsClient(ctx, collection, id)
+	return s.certificateGetAsClient(ctx, collection, id, remaining)
 
 }
 
-func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string) (certificate client.Certificate, err error) {
+func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string, remaining int64) (certificate client.Certificate, err error) {
 
 	err = s.store.Get(ctx, collection, id, &certificate)
 	if err != nil {
@@ -119,14 +123,74 @@ func (s *Service) certificateGetAsServer(ctx context.Context, collection, id str
 
 	certificate.X509Certificate, err = manager.CertificateFromPEM(certificate.Certificate)
 
+	if remaining > 0 {
+		if s.IsNearToExpire(certificate, remaining) {
+
+			var (
+				ca             *manager.CA
+				caCertificate  client.Certificate
+				key            crypto.PrivateKey
+				newCertificate *x509.Certificate
+			)
+
+			// get the CA
+			err = s.store.Get(ctx, collection, "ca", &caCertificate)
+			if err != nil {
+				return
+			}
+
+			ca, err = manager.FromBytes(caCertificate.Certificate, caCertificate.Key)
+			if err != nil {
+				return
+			}
+
+			// get current Key
+			key, err = manager.PrivateKeyFromPEM(certificate.Key)
+			if err != nil {
+				return
+			}
+
+			newCertificate, err = manager.APITox509Certificate(certificate.Request)
+			if err != nil {
+				return
+			}
+
+			certificate.Certificate, _, err = ca.CreateCertificate(newCertificate, key)
+			if err != nil {
+				return
+			}
+
+			err = s.store.Set(ctx, collection, id, certificate)
+
+		}
+
+	}
+
 	return
 
 }
 
-func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string) (certificate client.Certificate, err error) {
+func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string, remaining int64) (certificate client.Certificate, err error) {
+
+	// api must have a ?remaining=20 to return the certificate autorenewed in the API! so it will launch asServer
 
 	// TODO!
 	return
+
+}
+
+// IsNearToExpire returns true if certificate is already expired or remaining days are less than (percent/100)
+func (s *Service) IsNearToExpire(certificate client.Certificate, percent int64) bool {
+
+	var (
+		remainingDays    int64
+		maxRemainingDays int64
+	)
+
+	maxRemainingDays = certificate.Request.ExpirationDays * (percent / 100)
+	remainingDays = int64(certificate.X509Certificate.NotAfter.Sub(time.Now()).Hours()) / 24
+
+	return remainingDays < maxRemainingDays
 
 }
 
@@ -144,19 +208,21 @@ func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection
 
 // TODO: Make a IsValid for the api request, it must return error if required fields are lost (common name, expirity and key)
 
-func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, collection string, info client.APICertificateRequest) ([]byte, []byte, error) {
+func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, collection string, request client.APICertificateRequest) ([]byte, []byte, error) {
 
 	var (
 		certificate client.Certificate
 		err         error
 	)
 
-	certificate.Certificate, certificate.Key, err = ca.CreateCertificateFromAPI(info)
+	certificate.Certificate, certificate.Key, err = ca.CreateCertificateFromAPI(request)
 	if err != nil {
 		return []byte{}, []byte{}, err
 	}
 
-	err = s.store.Set(ctx, collection, info.DN.CN, certificate)
+	certificate.Request = request
+
+	err = s.store.Set(ctx, collection, request.DN.CN, certificate)
 	if err != nil {
 		return []byte{}, []byte{}, err
 	}
