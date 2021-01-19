@@ -1,7 +1,8 @@
 /*
 Copyright © 2020 @fernandezvara
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
+Permission is hereby granted,
+ free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -40,12 +41,19 @@ func buildService() (srv *service.Service) {
 
 	if viper.GetBool(configAPIEnabled) {
 		var cli *client.Client
-		cli, err = client.New()
+		cli, err = client.New(viper.GetString(configAPIAddr),
+			viper.GetString(configAPICA),
+			viper.GetString(configAPICertificate),
+			viper.GetString(configAPIKey),
+		)
 		er(err)
 		srv = service.NewAsClient(cli)
 	} else {
 		var sto store.Store
-		sto, err = store.Open(context.Background(), viper.GetString(configDBType), viper.GetString(configDBConnectionString))
+		sto, err = store.Open(context.Background(),
+			viper.GetString(configDBType),
+			viper.GetString(configDBConnectionString),
+		)
 		er(err)
 		srv = service.NewAsServer(sto)
 	}

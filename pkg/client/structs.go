@@ -2,6 +2,10 @@ package client
 
 import "crypto/x509"
 
+const (
+	userAgent = "client.certsfor.dev"
+)
+
 // Certificate holds the certificate and key file used to interact with the
 // data store
 type Certificate struct {
