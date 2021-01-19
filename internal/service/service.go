@@ -15,29 +15,35 @@ import (
 
 // Service is the struct used for every request
 type Service struct {
-	store  store.Store
-	client *client.Client
-	server bool
+	store   store.Store
+	client  *client.Client
+	server  bool
+	version string
 }
 
 // NewAsServer creates a Service instance that handles the store directly
-func NewAsServer(store store.Store) *Service {
+func NewAsServer(store store.Store, version string) *Service {
 	return &Service{
-		store:  store,
-		server: true,
+		version: version,
+		store:   store,
+		server:  true,
 	}
 }
 
 // NewAsClient creates a Server instance that requires a remote server to operate
-func NewAsClient(client *client.Client) *Service {
+func NewAsClient(client *client.Client, version string) *Service {
 	return &Service{
-		client: client,
+		version: version,
+		client:  client,
 	}
 }
 
 // Close the store service in a proper way
 func (s *Service) Close() error {
-	return s.store.Close()
+	if s.store != nil { // is used?
+		return s.store.Close()
+	}
+	return nil
 }
 
 // CACreate is responsible of create a new CA struct with its certificate returning its information
@@ -279,5 +285,20 @@ func (s *Service) CertificateDelete(ctx context.Context, collection, cn string) 
 	}
 
 	return false, nil // TODO: client
+
+}
+
+// Status returns the status for the service. If used as server it will return ok
+// For client request, an API call will be done to ensure availability
+func (s *Service) Status() (status client.APIStatus, err error) {
+
+	if s.server {
+		status.Version = s.version
+		return
+	}
+
+	status, err = s.client.Status()
+
+	return
 
 }

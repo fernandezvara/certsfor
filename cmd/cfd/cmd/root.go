@@ -66,6 +66,10 @@ func initConfig() {
 	// api
 	viper.SetDefault(configAPIAddr, configAPIAddrDefault)
 	viper.BindEnv(configAPIAddr, configAPIAddrEnv)
+
+	viper.SetDefault(configAPIEnabled, configAPIEnabledDefault)
+	viper.BindEnv(configAPIEnabled, configAPIEnabledEnv)
+
 	viper.SetDefault(configAPICA, configAPICADefault)
 	viper.BindEnv(configAPICA, configAPICAEnv)
 	viper.SetDefault(configAPICertificate, configAPICertificateDefault)

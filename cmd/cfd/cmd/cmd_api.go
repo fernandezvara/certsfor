@@ -75,7 +75,7 @@ func apiFunc(cmd *cobra.Command, args []string) {
 
 	sto, err = store.Open(context.Background(), viper.GetString(configDBType), viper.GetString(configDBConnectionString))
 	er(err)
-	srv = service.NewAsServer(sto)
+	srv = service.NewAsServer(sto, Version)
 
 	if isUUID(viper.GetString(configAPICA)) {
 		// get cert from DB

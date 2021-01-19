@@ -76,5 +76,5 @@ func NewWithConnectionTimeouts(baseURL, caCertPath, certPath, keyPath string, di
 		Transport: &httpTransport,
 	}).Set("User-Agent", userAgent).Base(fmt.Sprintf("%s://%s/", scheme, baseURL))
 
-	return &Client{}, nil
+	return &client, nil
 }

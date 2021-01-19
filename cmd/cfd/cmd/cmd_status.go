@@ -1,8 +1,7 @@
 /*
 Copyright © 2020 @fernandezvara
 
-Permission is hereby granted,
- free of charge, to any person obtaining a copy
+Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -24,40 +23,39 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"context"
+	"fmt"
 
-	_ "github.com/fernandezvara/certsfor/db/badger"    // store driver
-	_ "github.com/fernandezvara/certsfor/db/firestore" // store driver
-	"github.com/fernandezvara/certsfor/db/store"
 	"github.com/fernandezvara/certsfor/internal/service"
-	"github.com/fernandezvara/certsfor/pkg/client"
-	"github.com/spf13/viper"
+	"github.com/spf13/cobra"
 )
 
-// returns a service object or fails if configuration invalid or not found
-func buildService() (srv *service.Service) {
+// getStatusCmd represents the bootstrap command
+var getStatusCmd = &cobra.Command{
+	Use:   "status",
+	Short: "Status of local / remote API.",
+	Long:  `Status of local / remote API.`,
+	Run:   getStatusFunc,
+}
 
-	var err error
+func init() {
+	rootCmd.AddCommand(getStatusCmd)
+	getStatusCmd.Flags().StringVarP(&global.certFile, "cert", "c", "", "Certificate file location.")
+	getStatusCmd.Flags().StringVarP(&global.bundleFile, "bundle", "b", "", "Bundle file location.")
+	getStatusCmd.Flags().StringVarP(&global.keyFile, "key", "k", "", "Key file location.")
+}
 
-	if viper.GetBool(configAPIEnabled) {
-		var cli *client.Client
-		cli, err = client.New(viper.GetString(configAPIAddr),
-			viper.GetString(configAPICA),
-			viper.GetString(configAPICertificate),
-			viper.GetString(configAPIKey),
-		)
-		er(err)
-		srv = service.NewAsClient(cli, Version)
-	} else {
-		var sto store.Store
-		sto, err = store.Open(context.Background(),
-			viper.GetString(configDBType),
-			viper.GetString(configDBConnectionString),
-		)
-		er(err)
-		srv = service.NewAsServer(sto, Version)
-	}
+func getStatusFunc(cmd *cobra.Command, args []string) {
 
-	return
+	var (
+		srv *service.Service
+		err error
+	)
+
+	srv = buildService()
+	defer srv.Close()
+
+	status, err := srv.Status()
+
+	fmt.Println(status, err)
 
 }
