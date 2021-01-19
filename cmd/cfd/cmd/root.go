@@ -76,14 +76,14 @@ func initConfig() {
 	viper.BindEnv(configAPICertificate, configAPICertificateEnv)
 	viper.SetDefault(configAPIKey, configAPIKeyDefault)
 	viper.BindEnv(configAPIKey, configAPIKeyEnv)
-	viper.SetDefault(configWebEnabled, configWebEnabledDefault)
-	viper.BindEnv(configWebEnabled, configWebEnabledEnv)
 	viper.SetDefault(configAPIAccessLog, configAPIAccessLogDefault)
 	viper.BindEnv(configAPIAccessLog, configAPIAccessLogEnv)
 	viper.SetDefault(configAPIErrorLog, configAPIErrorLogDefault)
 	viper.BindEnv(configAPIErrorLog, configAPIErrorLogEnv)
 	viper.SetDefault(configAPIDebugLog, configAPIDebugLogDefault)
 	viper.BindEnv(configAPIDebugLog, configAPIDebugLogEnv)
+	// viper.SetDefault(configWebEnabled, configWebEnabledDefault)
+	// viper.BindEnv(configWebEnabled, configWebEnabledEnv)
 
 	// ca id
 	viper.SetDefault(configCAID, configCAIDDefault)

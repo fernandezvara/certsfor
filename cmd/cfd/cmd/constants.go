@@ -105,9 +105,6 @@ var (
 	configAPIKey                = "api.tls.key"
 	configAPIKeyEnv             = "CFD_API_KEY"
 	configAPIKeyDefault         = ""
-	configWebEnabled            = "api.web"
-	configWebEnabledEnv         = "CFD_WEB_ENABLED"
-	configWebEnabledDefault     = false
 	configAPIAccessLog          = "api.log.access"
 	configAPIAccessLogEnv       = "CFD_LOG_ACCESS"
 	configAPIAccessLogDefault   = []string{"stdout"}
@@ -117,6 +114,9 @@ var (
 	configAPIDebugLog           = "api.log.debug"
 	configAPIDebugLogEnv        = "CFD_LOG_DEBUG"
 	configAPIDebugLogDefault    = false
+	// configWebEnabled            = "api.web"
+	// configWebEnabledEnv         = "CFD_WEB_ENABLED"
+	// configWebEnabledDefault     = false
 
 	// ca id
 	configCAID        = "ca-id"
