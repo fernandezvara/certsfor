@@ -105,7 +105,7 @@ func apiFunc(cmd *cobra.Command, args []string) {
 
 	}
 
-	a = api.New(srv)
+	a = api.New(srv, Version)
 	err = a.Start(viper.GetString(configAPIAddr), cert, key, cacert, viper.GetStringSlice(configAPIAccessLog), viper.GetStringSlice(configAPIErrorLog), viper.GetBool(configAPIDebugLog))
 	er(err)
 

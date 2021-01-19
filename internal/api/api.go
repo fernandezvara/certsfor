@@ -12,14 +12,16 @@ import (
 
 // API is the struct that manages the api
 type API struct {
-	srv *service.Service
+	srv     *service.Service
+	version string
 }
 
 // New returns the API struct
-func New(srv *service.Service) *API {
+func New(srv *service.Service, version string) *API {
 
 	return &API{
-		srv: srv,
+		srv:     srv,
+		version: version,
 	}
 
 }

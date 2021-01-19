@@ -30,6 +30,9 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
+// Version variable to be updated at build time
+var Version = "0.1"
+
 // global variables
 type globalConfig struct {
 	home       string // $HOME

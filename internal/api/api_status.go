@@ -15,6 +15,8 @@ func (a *API) getStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		response client.APIStatus
 	)
 
+	response.Version = a.version
+
 	rest.Response(w, response, nil, 200, "")
 
 }
