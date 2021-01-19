@@ -77,7 +77,6 @@ var (
 	configFileString        = "config"
 	configFileStringEnv     = "CFD_CONFIG"
 	configFileStringDefault string
-	// configFileStringDefault = pathFromHome(".cfd", "config.yaml")
 
 	// database config
 	configDBType                    = "db.type"
@@ -86,7 +85,6 @@ var (
 	configDBConnectionString        = "db.connection"
 	configDBConnectionStringEnv     = "CFD_DB_CONNECTION"
 	configDBConnectionStringDefault string
-	//configDBConnectionStringDefault = pathFromHome(".cfd", "db")
 
 	// api config
 	configAPIEnabled            = "api.enabled"
