@@ -39,9 +39,9 @@ type globalConfig struct {
 	bundleFile string // bundle file location
 	keyFile    string // key file location
 	collection string // ca id <-> colelction
-	cn         string
-	bool1      bool  // common bool option
-	remaining  int64 // remaining days (integer) for expiration
+	cn         string // common name as argument
+	bool1      bool   // common bool option
+	remaining  int64  // remaining days (integer) for expiration
 }
 
 // detect home folder
