@@ -9,10 +9,12 @@ const (
 // Certificate holds the certificate and key file used to interact with the
 // data store
 type Certificate struct {
-	Key             []byte                `json:"key"`
-	Certificate     []byte                `json:"certificate"`
+	Key             []byte                `json:"key,omitempty"`
+	Certificate     []byte                `json:"certificate,omitempty"`
+	CACertificate   []byte                `json:"ca_certificate,omitempty"`
 	X509Certificate *x509.Certificate     `json:"-"`
 	Request         APICertificateRequest `json:"request"`
+	CAID            string                `json:"ca_id,omitempty"`
 }
 
 // APICertificateRequest is the struct with the data needed to create a new

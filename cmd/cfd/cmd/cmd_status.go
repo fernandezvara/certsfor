@@ -39,9 +39,6 @@ var getStatusCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(getStatusCmd)
-	getStatusCmd.Flags().StringVarP(&global.certFile, "cert", "c", "", "Certificate file location.")
-	getStatusCmd.Flags().StringVarP(&global.bundleFile, "bundle", "b", "", "Bundle file location.")
-	getStatusCmd.Flags().StringVarP(&global.keyFile, "key", "k", "", "Key file location.")
 }
 
 func getStatusFunc(cmd *cobra.Command, args []string) {
@@ -56,6 +53,12 @@ func getStatusFunc(cmd *cobra.Command, args []string) {
 
 	status, err := srv.Status()
 
-	fmt.Println(status, err)
+	fmt.Println("Versions:")
+	if err != nil {
+		fmt.Printf("  Client: %s\n\nError Connecting to Server: %s\n", Version, err.Error())
+		return
+	}
+
+	fmt.Printf("  Client: %s\n  Server: %s\n", Version, status.Version)
 
 }

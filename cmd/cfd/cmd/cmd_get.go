@@ -26,7 +26,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/spf13/cobra"
@@ -56,7 +55,6 @@ func getCertificateFunc(cmd *cobra.Command, args []string) {
 	var (
 		srv        *service.Service
 		collection string
-		ca         *manager.CA
 		cert       client.Certificate
 		err        error
 		ctx        context.Context = context.Background()
@@ -67,13 +65,10 @@ func getCertificateFunc(cmd *cobra.Command, args []string) {
 
 	collection = collectionOrExit()
 
-	ca, err = srv.CAGet(collection)
-	er(err)
-
 	cert, err = srv.CertificateGet(ctx, collection, global.cn, global.remaining)
 	er(err)
 
-	saveFiles(ca, cert.Certificate, cert.Key)
+	saveFiles(cert.CACertificate, cert.Certificate, cert.Key)
 
 	fmt.Println("\n\nCertificate Retrieved.")
 

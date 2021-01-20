@@ -28,7 +28,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/spf13/viper"
 )
@@ -120,7 +119,7 @@ func collectionOrExit() (collection string) {
 	return
 }
 
-func saveFiles(ca *manager.CA, bytesCert, bytesKey []byte) {
+func saveFiles(ca, bytesCert, bytesKey []byte) {
 
 	if global.certFile != "" {
 		er(ioutil.WriteFile(global.certFile, bytesCert, 0400))
@@ -131,7 +130,7 @@ func saveFiles(ca *manager.CA, bytesCert, bytesKey []byte) {
 	}
 
 	if global.bundleFile != "" {
-		er(ioutil.WriteFile(global.keyFile, append(bytesCert, ca.CACertificate()...), 0400))
+		er(ioutil.WriteFile(global.keyFile, append(bytesCert, ca...), 0400))
 	}
 
 }

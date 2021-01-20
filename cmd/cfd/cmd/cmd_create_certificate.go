@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/spf13/cobra"
@@ -62,7 +61,7 @@ func createCertificateFunc(cmd *cobra.Command, args []string) {
 		srv        *service.Service
 		request    client.APICertificateRequest
 		collection string
-		ca         *manager.CA
+		bytesCA    []byte
 		bytesCert  []byte
 		bytesKey   []byte
 		bytesInput []byte
@@ -75,11 +74,9 @@ func createCertificateFunc(cmd *cobra.Command, args []string) {
 
 	collection = collectionOrExit()
 
-	ca, err = srv.CAGet(collection)
-	er(err)
+	// TODO: fill from CSR
 
 	// fill from YAML
-	// TODO: fill from CSR
 	if global.filename != "" {
 		bytesInput, err = ioutil.ReadFile(global.filename)
 		er(err)
@@ -93,10 +90,10 @@ func createCertificateFunc(cmd *cobra.Command, args []string) {
 		interactiveCertificate(&request)
 	}
 
-	bytesCert, bytesKey, err = srv.CertificateSet(ctx, ca, collection, request)
+	bytesCA, bytesCert, bytesKey, err = srv.CertificateSet(ctx, collection, request)
 	er(err)
 
-	saveFiles(ca, bytesCert, bytesKey)
+	saveFiles(bytesCA, bytesCert, bytesKey)
 
 	fmt.Println("\n\nCertificate Created.")
 

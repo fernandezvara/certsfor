@@ -53,8 +53,19 @@ func (s *Service) CACreate(ctx context.Context, request client.APICertificateReq
 		return s.caCreateServer(ctx, request)
 	}
 
-	// TODO: call api!
-	return nil, "", []byte{}, []byte{}, nil
+	return s.caCreateClient(ctx, request)
+
+}
+
+func (s *Service) caCreateClient(ctx context.Context, request client.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
+
+	var (
+		certificate client.Certificate
+		err         error
+	)
+
+	certificate, err = s.client.CACreate(request)
+	return nil, certificate.CAID, certificate.Certificate, certificate.Key, err
 
 }
 
@@ -201,39 +212,56 @@ func (s *Service) IsNearToExpire(certificate client.Certificate, percent int64) 
 }
 
 // CertificateSet creates a new certificate and stores in the store (if server) or POST to the API
-func (s *Service) CertificateSet(ctx context.Context, ca *manager.CA, collection string, info client.APICertificateRequest) ([]byte, []byte, error) {
+func (s *Service) CertificateSet(ctx context.Context, collection string, request client.APICertificateRequest) ([]byte, []byte, []byte, error) {
 
 	if s.server {
-		return s.certificateSetAsServer(ctx, ca, collection, info)
-
+		return s.certificateSetAsServer(ctx, collection, request)
 	}
 
-	return []byte{}, []byte{}, nil
+	return s.certificateSetAsClient(ctx, collection, request)
+
+}
+
+func (s *Service) certificateSetAsClient(ctx context.Context, collection string, request client.APICertificateRequest) ([]byte, []byte, []byte, error) {
+
+	var (
+		response client.Certificate
+		err      error
+	)
+
+	response, err = s.client.CertificateCreate(collection, request.DN.CN, request)
+	return response.CACertificate, response.Certificate, response.Key, err
 
 }
 
 // TODO: Make a IsValid for the api request, it must return error if required fields are lost (common name, expirity and key)
 
-func (s *Service) certificateSetAsServer(ctx context.Context, ca *manager.CA, collection string, request client.APICertificateRequest) ([]byte, []byte, error) {
+func (s *Service) certificateSetAsServer(ctx context.Context, collection string, request client.APICertificateRequest) ([]byte, []byte, []byte, error) {
 
 	var (
 		certificate client.Certificate
+		ca          *manager.CA
 		err         error
 	)
 
+	ca, err = s.CAGet(collection)
+	if err != nil {
+		return []byte{}, []byte{}, []byte{}, err
+	}
+
 	certificate.Certificate, certificate.Key, err = ca.CreateCertificateFromAPI(request)
 	if err != nil {
-		return []byte{}, []byte{}, err
+		return []byte{}, []byte{}, []byte{}, err
 	}
 
 	certificate.Request = request
 
 	err = s.store.Set(ctx, collection, request.DN.CN, certificate)
 	if err != nil {
-		return []byte{}, []byte{}, err
+		return []byte{}, []byte{}, []byte{}, err
 	}
 
-	return certificate.Certificate, certificate.Key, err
+	return ca.CACertificate(), certificate.Certificate, certificate.Key, err
 }
 
 // CertificateList returns an array of certificates and its x509 representation
@@ -298,7 +326,6 @@ func (s *Service) Status() (status client.APIStatus, err error) {
 	}
 
 	status, err = s.client.Status()
-
 	return
 
 }

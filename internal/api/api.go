@@ -43,6 +43,18 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, ou
 				Matcher: []string{""},
 			},
 		},
+		"POST": {
+			"/v1/ca": {
+				Handler: a.postCA,
+				Matcher: []string{"", ""},
+			},
+		},
+		"PUT": {
+			"/v1/ca/:caid/certificates/:cn": {
+				Handler: a.putCertificate,
+				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_"},
+			},
+		},
 	}
 
 	logger, err = rest.NewLogging(outputPaths, errorOutputPaths, debug)
