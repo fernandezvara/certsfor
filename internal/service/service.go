@@ -121,7 +121,7 @@ func (s *Service) CAGet(collection string) (*manager.CA, error) {
 }
 
 // CertificateGet returns the certificate and its key information
-func (s *Service) CertificateGet(ctx context.Context, collection, id string, remaining int64) (client.Certificate, error) {
+func (s *Service) CertificateGet(ctx context.Context, collection, id string, remaining int) (client.Certificate, error) {
 
 	if s.server {
 		return s.certificateGetAsServer(ctx, collection, id, remaining)
@@ -131,7 +131,7 @@ func (s *Service) CertificateGet(ctx context.Context, collection, id string, rem
 
 }
 
-func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string, remaining int64) (certificate client.Certificate, err error) {
+func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string, remaining int) (certificate client.Certificate, err error) {
 
 	err = s.store.Get(ctx, collection, id, &certificate)
 	if err != nil {
@@ -187,24 +187,23 @@ func (s *Service) certificateGetAsServer(ctx context.Context, collection, id str
 
 }
 
-func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string, remaining int64) (certificate client.Certificate, err error) {
+func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string, remaining int) (certificate client.Certificate, err error) {
 
-	// api must have a ?remaining=20 to return the certificate autorenewed in the API! so it will launch asServer
-
-	// TODO!
+	// api must have a ?renew=20 to return the certificate autorenewed in the API!
+	certificate, err = s.client.CertificateGet(collection, id, remaining)
 	return
 
 }
 
 // IsNearToExpire returns true if certificate is already expired or remaining days are less than (percent/100)
-func (s *Service) IsNearToExpire(certificate client.Certificate, percent int64) bool {
+func (s *Service) IsNearToExpire(certificate client.Certificate, percent int) bool {
 
 	var (
 		remainingDays    int64
 		maxRemainingDays int64
 	)
 
-	maxRemainingDays = certificate.Request.ExpirationDays * (percent / 100)
+	maxRemainingDays = certificate.Request.ExpirationDays * (int64(percent) / 100)
 	remainingDays = int64(certificate.X509Certificate.NotAfter.Sub(time.Now()).Hours()) / 24
 
 	return remainingDays < maxRemainingDays

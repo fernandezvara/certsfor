@@ -39,14 +39,13 @@ import (
 // apiCmd represents the bootstrap command
 var apiCmd = &cobra.Command{
 	Use:   "api",
-	Short: "Starts the API.",
-	Long:  `Starts the API.`,
+	Short: "Starts as REST API service allowing remote cfd clients.",
+	Long:  `Starts as REST API service allowing remote cfd clients.`,
 	Run:   apiFunc,
 }
 
 func init() {
-	rootCmd.AddCommand(apiCmd)
-	apiCmd.Flags().Int64Var(&global.remaining, "renew", 20, "(optional) Renew the certificate if the remaining lifetime is the selected days or less (defaults to 20). Key remains the same. Only used if configured CA-ID+CN.")
+	startCmd.AddCommand(apiCmd)
 }
 
 func isUUID(uuid string) bool {
@@ -95,7 +94,7 @@ func apiFunc(cmd *cobra.Command, args []string) {
 		key = crt.Key
 
 	} else {
-
+		// ca certificate is a file?
 		cacert, err = fileBytes(viper.GetString(configAPICA))
 		er(err)
 		cert, err = fileBytes(viper.GetString(configAPICertificate))

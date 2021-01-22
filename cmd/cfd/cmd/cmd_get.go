@@ -46,7 +46,7 @@ func init() {
 	getCertificateCmd.Flags().StringVarP(&global.keyFile, "key", "k", "", "Key file location.")
 	getCertificateCmd.Flags().StringVar(&global.collection, "ca-id", "", "CA Identifier. (required). [$CFD_CA_ID]")
 	getCertificateCmd.Flags().StringVar(&global.cn, "cn", "", "Common Name. (required).")
-	getCertificateCmd.Flags().Int64Var(&global.remaining, "renew", 20, "Renew the certificate if the remaining lifetime is the selected days or less (defaults to 20). Key remains the same.")
+	getCertificateCmd.Flags().IntVar(&global.remaining, "renew", 20, "Time (expresed as percent) to be used to determine if the certificate must be renewed (defaults to 20 %). Key remains the same.")
 	getCertificateCmd.MarkFlagRequired("cn")
 }
 

@@ -43,7 +43,7 @@ func caTemplate() (request client.APICertificateRequest) {
 
 func certTemplate() (request client.APICertificateRequest) {
 
-	request.DN.CN = "common name"
+	request.DN.CN = "common-name"
 	request.Key = client.RSA4096
 	request.ExpirationDays = 90
 	return
@@ -130,7 +130,7 @@ func saveFiles(ca, bytesCert, bytesKey []byte) {
 	}
 
 	if global.bundleFile != "" {
-		er(ioutil.WriteFile(global.keyFile, append(bytesCert, ca...), 0400))
+		er(ioutil.WriteFile(global.bundleFile, append(bytesCert, ca...), 0400))
 	}
 
 }

@@ -42,6 +42,10 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, ou
 				Handler: a.getStatus,
 				Matcher: []string{""},
 			},
+			"/v1/ca/:caid/certificates/:cn": {
+				Handler: a.getCertificate,
+				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_]+"},
+			},
 		},
 		"POST": {
 			"/v1/ca": {
@@ -52,7 +56,7 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, ou
 		"PUT": {
 			"/v1/ca/:caid/certificates/:cn": {
 				Handler: a.putCertificate,
-				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_"},
+				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_]+"},
 			},
 		},
 	}

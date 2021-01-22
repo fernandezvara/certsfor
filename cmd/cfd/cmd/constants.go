@@ -44,7 +44,9 @@ type globalConfig struct {
 	collection string // ca id <-> colelction
 	cn         string // common name as argument
 	bool1      bool   // common bool option
-	remaining  int64  // remaining days (integer) for expiration
+	remaining  int    // remaining percert (integer) for expiration
+	listen     string // webserver ip:port to listen
+	root       string // webserver root
 }
 
 // detect home folder
@@ -123,10 +125,10 @@ var (
 	configCAIDEnv     = "CFD_CA_ID"
 	configCAIDDefault = ""
 
-	// Configuration contents
-	configAPIClient        = "api.client"
-	configAPIClientEnv     = "VEIL_API_CLIENT_ADDR"
-	configAPIClientDefault = "http://127.0.0.1:8080"
-	configAPILog           = "api.log"
-	configAPILogEnv        = "VEIL_API_LOG"
+	// // Configuration contents
+	// configAPIClient        = "api.client"
+	// configAPIClientEnv     = "VEIL_API_CLIENT_ADDR"
+	// configAPIClientDefault = "http://127.0.0.1:8080"
+	// configAPILog           = "api.log"
+	// configAPILogEnv        = "VEIL_API_LOG"
 )

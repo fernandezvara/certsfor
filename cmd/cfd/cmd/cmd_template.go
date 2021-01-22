@@ -33,7 +33,7 @@ import (
 // templateCmd creates a file using caTemplate as base
 var templateCmd = &cobra.Command{
 	Use:   "template",
-	Short: "Creates a YAML file with the data required for a Certificate creation.",
+	Short: "Creates an empty YAML template file with sane defaults for Certificate request.",
 	Long: `Creates a YAML file with the data required for a Certificate creation.
 	
 The file will have the required fields already filled. Customize based on your needs.`,
@@ -41,7 +41,8 @@ The file will have the required fields already filled. Customize based on your n
 }
 
 func init() {
-	rootCmd.AddCommand(templateCmd)
+	createCmd.AddCommand(templateCmd)
+	// rootCmd.AddCommand(templateCmd)
 	templateCmd.Flags().StringVarP(&global.filename, "file", "f", "", "Filename where the template will be stored in YAML format.")
 	templateCmd.Flags().BoolVar(&global.bool1, "ca", false, "Template for CA")
 }
