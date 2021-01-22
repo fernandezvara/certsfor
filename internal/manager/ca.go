@@ -176,10 +176,17 @@ func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 
 }
 
-// CACertificate returns the CA certificate []byte
-func (c *CA) CACertificate() []byte {
+// CACertificateBytes returns the CA certificate []byte
+func (c *CA) CACertificateBytes() []byte {
 
 	return c.bytesCertificate
+
+}
+
+// CACertificate returns the x509 CA certificate
+func (c *CA) CACertificate() *x509.Certificate {
+
+	return c.ca
 
 }
 

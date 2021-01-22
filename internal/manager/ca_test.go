@@ -166,8 +166,10 @@ func TestSANsAndAPIrequests(t *testing.T) {
 	assert.Contains(t, otherManager.ca.DNSNames, dns1)
 	assert.Contains(t, otherManager.ca.DNSNames, dns2)
 
-	assert.Equal(t, certFile, newCA.CACertificate())
-	assert.Equal(t, certFile, otherManager.CACertificate())
+	assert.Equal(t, certFile, newCA.CACertificateBytes())
+	assert.Equal(t, certFile, otherManager.CACertificateBytes())
+	assert.Equal(t, request.DN.CN, newCA.CACertificate().Subject.CommonName)
+	assert.Equal(t, request.DN.CN, otherManager.CACertificate().Subject.CommonName)
 
 	var newRequest client.APICertificateRequest
 

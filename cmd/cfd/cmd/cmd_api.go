@@ -89,7 +89,7 @@ func apiFunc(cmd *cobra.Command, args []string) {
 		crt, err = srv.CertificateGet(context.Background(), viper.GetString(configAPICA), viper.GetString(configAPICertificate), global.remaining)
 		er(err)
 
-		cacert = ca.CACertificate()
+		cacert = ca.CACertificateBytes()
 		cert = crt.Certificate
 		key = crt.Key
 

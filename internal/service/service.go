@@ -9,6 +9,7 @@ import (
 	"github.com/fernandezvara/certsfor/db/store"
 	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/pkg/client"
+	"github.com/fernandezvara/rest"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 )
@@ -248,6 +249,10 @@ func (s *Service) certificateSetAsServer(ctx context.Context, collection string,
 		return []byte{}, []byte{}, []byte{}, err
 	}
 
+	if request.DN.CN == ca.CACertificate().Issuer.CommonName {
+		return []byte{}, []byte{}, []byte{}, rest.ErrConflict
+	}
+
 	certificate.Certificate, certificate.Key, err = ca.CreateCertificateFromAPI(request)
 	if err != nil {
 		return []byte{}, []byte{}, []byte{}, err
@@ -260,7 +265,7 @@ func (s *Service) certificateSetAsServer(ctx context.Context, collection string,
 		return []byte{}, []byte{}, []byte{}, err
 	}
 
-	return ca.CACertificate(), certificate.Certificate, certificate.Key, err
+	return ca.CACertificateBytes(), certificate.Certificate, certificate.Key, err
 }
 
 // CertificateList returns an array of certificates and its x509 representation
