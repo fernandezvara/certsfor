@@ -26,14 +26,13 @@ Flags:
 
 ?> The CA ID is the identification that needs to be passed to the tool to make the operations with the right CA. The ID can be passed by:<br>- Flag: --ca-id="your uuid"<br>- Environment variable ($CFD_CA_ID)<br>- Configuration switch on the config file. (ca-id)
 
-
 !> **Do not share the CA key file. It can be used to hijack TLS connections and sniff (read) the traffic.**
 
 ## create certificate
 
 Certificate creation expects the same answers than the CA.
 
-Flags allows to set where to store a bundle certificate file, used in some services like [NGINX](https://www.nginx.org/), certificate and key files.
+Flags allows to set where to store a bundle certificate file, used in some services like [NGINX](https://www.nginx.org/), certificate and/or key files.
 
 ```bash
 Usage:
@@ -50,3 +49,52 @@ Flags:
   -k, --key string      Key file location. NOTE: Do not share this file.
 ```
 
+## get
+
+Retrieve any certificate using its Common Name as Identifier. This command will get the certificate stored on the database if valid or will get a new updated one.
+
+By default, when a certificate is retrieved using the cli, it will ask the CA to renew it if the time remaining for its expiration is less than the desired percent.
+
+```bash
+Flags:
+  -b, --bundle string   Bundle file location.
+      --ca-id string    CA Identifier. (required). [$CFD_CA_ID]
+  -c, --cert string     Certificate file location.
+      --cn string       Common Name. (required).
+  -h, --help            help for get
+  -k, --key string      Key file location.
+      --renew int       Time (expresed as percent) to be used to determine if the certificate 
+      must be renewed (defaults to 20%). Key remains the same. (default 20)
+```
+
+## start api
+
+Starts cfd in daemon-mode. This mode allows remote cfd clients or simple call (like curl) usage.
+
+!> By default API does not have any security applied, so its recommended to create certificates to secure the communication on transit.
+
+Refer to the [API documentation](api.md) for full information.
+
+## start webserver
+
+Starts a simple webserver on the desired path using the desired certificate. It's required to select the CA ID and Common Name to execute this mode.
+
+By default webserver serves the files in the current directory, listen in all IPs and TPC port 8443. If certificate needs to be renewed it defaults to a 20% lifetime.
+
+```bash
+Flags:
+      --ca-id string    CA Identifier. (required). [$CFD_CA_ID]
+      --cn string       Common Name. (required).
+  -h, --help            help for webserver
+      --listen string   IP:TCP Port where the server will be served. Defaults to all network interfaces and port 8443. (default "0.0.0.0:8443")
+      --renew int       Time (expresed as percent) to be used to determine if the certificate must be renewed (defaults to 20 %). Key remains the same. (default 20)
+      --root string     Directory where the files reside, defaults to current (.). (default ".")
+```
+
+## status
+
+Checks if service is usable. If it's operating in a local mode it will open the database and make a simple test to ensure it's ok.
+
+On remote mode, as API client, it will make a request to the API and will show versions on both sides.
+
+There is no required flags since it reads the configuration file and executes.
