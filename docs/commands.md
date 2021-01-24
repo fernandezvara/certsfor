@@ -35,7 +35,7 @@ Usage: `cfd create ca [flags]`
 >- Environment variable (`$CFD_CA_ID`)
 >- Configuration switch on the config file. (`ca-id`)
 
-> [!ATTENTION|style:flat]
+> [!ATTENTION]
 > **Do not share the CA key file. It can be used to hijack TLS connections and sniff (read) the traffic.**
 
 ## create certificate
@@ -90,7 +90,8 @@ Starts cfd in daemon-mode. This mode allows remote cfd clients or simple call (l
 
 Usage `cfd start api`
 
-!> By default API does not have any security applied, so its recommended to create certificates to secure the communication on transit.
+> [!ATTENTION]
+> By default API does not have any security applied, so its recommended to create certificates to secure the communication on transit.
 
 Refer to the [API documentation](api.md) for full information.
 
@@ -117,5 +118,3 @@ Usage: `cfd status`
 Checks if service is usable. If it's operating in a local mode it will open the database and make a simple test to ensure it's ok.
 
 On remote mode, as API client, it will make a request to the API and will show versions on both sides.
-
-There is no flags.
