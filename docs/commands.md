@@ -4,13 +4,13 @@
 
 ## configfile
 
-By default, the tool comes configured with sane defaults to start working. If you are a solo developer probably you won't need to change anything.
+By default, the tool comes configured with sane defaults to start working, so there is not configuration file needed. If you are a solo developer probably you won't need to change anything.
 
-Configuration directory is `$HOME/.cfd` where the `config.yaml` lives if you want to create it and default database.
+Default configuration file is `$HOME/.cfd/config.yaml` and default database will be created on `$HOME/.cfd/db`. You can use other configuration file by using the global flag `--config
 
 ## create ca
 
-Creates a new Certification Authority based on the answers received, interactively or by using a template file. You can customize where to store the certificate file (-c, --cert) and its key (-k, --key).
+Creates a new Certification Authority based on the answers received, interactively or by using a template file. You can customize where to store the certificate file (`-c`, `--cert`) and its key (`-k`, `--key`).
 
 By using template files you can automate all certificate creation.
 
@@ -26,9 +26,10 @@ Flags:
 
 > [!TIP]
 > The CA ID is the identification that needs to be passed to the tool to make the operations with the right CA. The ID can be passed by:
->- Flag: --ca-id="your uuid"
->- Environment variable ($CFD_CA_ID)
->- Configuration switch on the config file. (ca-id)
+>
+>- Flag: `--ca-id="your uuid"`
+>- Environment variable (`$CFD_CA_ID`)
+>- Configuration switch on the config file. (`ca-id`)
 
 > [!ATTENTION|style:flat]
 > **Do not share the CA key file. It can be used to hijack TLS connections and sniff (read) the traffic.**
@@ -91,8 +92,10 @@ Flags:
       --ca-id string    CA Identifier. (required). [$CFD_CA_ID]
       --cn string       Common Name. (required).
   -h, --help            help for webserver
-      --listen string   IP:TCP Port where the server will be served. Defaults to all network interfaces and port 8443. (default "0.0.0.0:8443")
-      --renew int       Time (expresed as percent) to be used to determine if the certificate must be renewed (defaults to 20 %). Key remains the same. (default 20)
+      --listen string   IP:TCP Port where the server will be served. Defaults to all network 
+      interfaces and port 8443. (default "0.0.0.0:8443")
+      --renew int       Time (expresed as percent) to be used to determine if the certificate
+      must be renewed (defaults to 20 %). Key remains the same. (default 20)
       --root string     Directory where the files reside, defaults to current (.). (default ".")
 ```
 
