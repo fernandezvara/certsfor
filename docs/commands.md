@@ -24,9 +24,14 @@ Flags:
   -k, --key string    Key file location. NOTE: Do not share this file.
 ```
 
-?> The CA ID is the identification that needs to be passed to the tool to make the operations with the right CA. The ID can be passed by:<br>- Flag: --ca-id="your uuid"<br>- Environment variable ($CFD_CA_ID)<br>- Configuration switch on the config file. (ca-id)
+> [!TIP]
+> The CA ID is the identification that needs to be passed to the tool to make the operations with the right CA. The ID can be passed by:
+>- Flag: --ca-id="your uuid"
+>- Environment variable ($CFD_CA_ID)
+>- Configuration switch on the config file. (ca-id)
 
-!> **Do not share the CA key file. It can be used to hijack TLS connections and sniff (read) the traffic.**
+> [!ATTENTION|style:flat]
+> **Do not share the CA key file. It can be used to hijack TLS connections and sniff (read) the traffic.**
 
 ## create certificate
 
@@ -77,7 +82,7 @@ Refer to the [API documentation](api.md) for full information.
 
 ## start webserver
 
-Starts a simple webserver on the desired path using the desired certificate. It's required to select the CA ID and Common Name to execute this mode.
+Starts a simple webserver that serves files from the selected directory using a certificate selected by its common name. It's required to select the CA ID and Common Name to execute this mode.
 
 By default webserver serves the files in the current directory, listen in all IPs and TPC port 8443. If certificate needs to be renewed it defaults to a 20% lifetime.
 
@@ -97,4 +102,4 @@ Checks if service is usable. If it's operating in a local mode it will open the 
 
 On remote mode, as API client, it will make a request to the API and will show versions on both sides.
 
-There is no required flags since it reads the configuration file and executes.
+There is no required flags since it reads the configuration file before execution.
