@@ -95,7 +95,11 @@ Usage `cfd start api`
 > [!ATTENTION]
 > By default API does not have any security applied, so its recommended to create certificates to secure the communication on transit.
 
-Refer to the [API documentation](api.md) for full information.
+Refer to the [API endpoints documentation](api.md) for its usage.
+
+>If you are using a HA capable data store, you run many instances that will behave as one (normally behind a load balancer)
+>
+>When using custom certificates on the API servers you can proxy TCP traffic directly from the load balancer to ensure point-to-point in transit data encryption.
 
 ## start webserver
 
