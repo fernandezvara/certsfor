@@ -64,19 +64,10 @@ func initConfig() {
 	viper.BindEnv(configDBType, configDBTypeEnv)
 	viper.SetDefault(configDBConnectionString, configDBConnectionStringDefault)
 	viper.BindEnv(configDBConnectionString, configDBConnectionStringEnv)
+
 	// api
 	viper.SetDefault(configAPIAddr, configAPIAddrDefault)
 	viper.BindEnv(configAPIAddr, configAPIAddrEnv)
-
-	viper.SetDefault(configAPIEnabled, configAPIEnabledDefault)
-	viper.BindEnv(configAPIEnabled, configAPIEnabledEnv)
-
-	viper.SetDefault(configAPICA, configAPICADefault)
-	viper.BindEnv(configAPICA, configAPICAEnv)
-	viper.SetDefault(configAPICertificate, configAPICertificateDefault)
-	viper.BindEnv(configAPICertificate, configAPICertificateEnv)
-	viper.SetDefault(configAPIKey, configAPIKeyDefault)
-	viper.BindEnv(configAPIKey, configAPIKeyEnv)
 	viper.SetDefault(configAPIAccessLog, configAPIAccessLogDefault)
 	viper.BindEnv(configAPIAccessLog, configAPIAccessLogEnv)
 	viper.SetDefault(configAPIErrorLog, configAPIErrorLogDefault)
@@ -85,6 +76,20 @@ func initConfig() {
 	viper.BindEnv(configAPIDebugLog, configAPIDebugLogEnv)
 	// viper.SetDefault(configWebEnabled, configWebEnabledDefault)
 	// viper.BindEnv(configWebEnabled, configWebEnabledEnv)
+
+	// api - client
+	viper.SetDefault(configAPIEnabled, configAPIEnabledDefault)
+	viper.BindEnv(configAPIEnabled, configAPIEnabledEnv)
+
+	// tls
+	viper.SetDefault(configTLSCA, configTLSCADefault)
+	viper.BindEnv(configTLSCA, configTLSCAEnv)
+	viper.SetDefault(configTLSCertificate, configTLSCertificateDefault)
+	viper.BindEnv(configTLSCertificate, configTLSCertificateEnv)
+	viper.SetDefault(configTLSKey, configTLSKeyDefault)
+	viper.BindEnv(configTLSKey, configTLSKeyEnv)
+	viper.SetDefault(configTLSUseForce, configTLSUseForceDefault)
+	viper.BindEnv(configTLSUseForce, configTLSUseForceEnv)
 
 	// ca id
 	viper.SetDefault(configCAID, configCAIDDefault)

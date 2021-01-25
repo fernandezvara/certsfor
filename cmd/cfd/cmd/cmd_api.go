@@ -76,17 +76,17 @@ func apiFunc(cmd *cobra.Command, args []string) {
 	er(err)
 	srv = service.NewAsServer(sto, Version)
 
-	if isUUID(viper.GetString(configAPICA)) {
+	if isUUID(viper.GetString(configTLSCA)) {
 		// get cert from DB
 		var (
 			ca  *manager.CA
 			crt client.Certificate
 		)
 
-		ca, err = srv.CAGet(viper.GetString(configAPICA))
+		ca, err = srv.CAGet(viper.GetString(configTLSCA))
 		er(err)
 
-		crt, err = srv.CertificateGet(context.Background(), viper.GetString(configAPICA), viper.GetString(configAPICertificate), global.remaining)
+		crt, err = srv.CertificateGet(context.Background(), viper.GetString(configTLSCA), viper.GetString(configTLSCertificate), global.remaining)
 		er(err)
 
 		cacert = ca.CACertificateBytes()
@@ -95,11 +95,11 @@ func apiFunc(cmd *cobra.Command, args []string) {
 
 	} else {
 		// ca certificate is a file?
-		cacert, err = fileBytes(viper.GetString(configAPICA))
+		cacert, err = fileBytes(viper.GetString(configTLSCA))
 		er(err)
-		cert, err = fileBytes(viper.GetString(configAPICertificate))
+		cert, err = fileBytes(viper.GetString(configTLSCertificate))
 		er(err)
-		key, err = fileBytes(viper.GetString(configAPIKey))
+		key, err = fileBytes(viper.GetString(configTLSKey))
 		er(err)
 
 	}

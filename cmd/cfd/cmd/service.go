@@ -42,9 +42,10 @@ func buildService() (srv *service.Service) {
 	if viper.GetBool(configAPIEnabled) {
 		var cli *client.Client
 		cli, err = client.New(viper.GetString(configAPIAddr),
-			viper.GetString(configAPICA),
-			viper.GetString(configAPICertificate),
-			viper.GetString(configAPIKey),
+			viper.GetString(configTLSCA),
+			viper.GetString(configTLSCertificate),
+			viper.GetString(configTLSKey),
+			viper.GetBool(configTLSUseForce),
 		)
 		er(err)
 		srv = service.NewAsClient(cli, Version)

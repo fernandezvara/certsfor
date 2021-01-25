@@ -93,43 +93,41 @@ var (
 	configDBConnectionStringDefault string
 
 	// api config
-	configAPIEnabled            = "api.enabled"
-	configAPIEnabledEnv         = "CFD_API_ENABLED"
-	configAPIEnabledDefault     = false
-	configAPIAddr               = "api.addr"
-	configAPIAddrEnv            = "CFD_API_ADDR"
-	configAPIAddrDefault        = "127.0.0.1:8080"
-	configAPICA                 = "api.tls.ca"
-	configAPICAEnv              = "CFD_API_CA"
-	configAPICADefault          = ""
-	configAPICertificate        = "api.tls.certificate"
-	configAPICertificateEnv     = "CFD_API_CERT"
-	configAPICertificateDefault = ""
-	configAPIKey                = "api.tls.key"
-	configAPIKeyEnv             = "CFD_API_KEY"
-	configAPIKeyDefault         = ""
-	configAPIAccessLog          = "api.log.access"
-	configAPIAccessLogEnv       = "CFD_LOG_ACCESS"
-	configAPIAccessLogDefault   = []string{"stdout"}
-	configAPIErrorLog           = "api.log.error"
-	configAPIErrorLogEnv        = "CFD_LOG_ERROR"
-	configAPIErrorLogDefault    = []string{"stderr"}
-	configAPIDebugLog           = "api.log.debug"
-	configAPIDebugLogEnv        = "CFD_LOG_DEBUG"
-	configAPIDebugLogDefault    = false
+	configAPIEnabled          = "api.enabled"
+	configAPIEnabledEnv       = "CFD_API_ENABLED"
+	configAPIEnabledDefault   = false
+	configAPIAddr             = "api.addr"
+	configAPIAddrEnv          = "CFD_API_ADDR"
+	configAPIAddrDefault      = "127.0.0.1:8080"
+	configAPIAccessLog        = "api.log.access"
+	configAPIAccessLogEnv     = "CFD_LOG_ACCESS"
+	configAPIAccessLogDefault = []string{"stdout"}
+	configAPIErrorLog         = "api.log.error"
+	configAPIErrorLogEnv      = "CFD_LOG_ERROR"
+	configAPIErrorLogDefault  = []string{"stderr"}
+	configAPIDebugLog         = "api.log.debug"
+	configAPIDebugLogEnv      = "CFD_LOG_DEBUG"
+	configAPIDebugLogDefault  = false
 	// configWebEnabled            = "api.web"
 	// configWebEnabledEnv         = "CFD_WEB_ENABLED"
 	// configWebEnabledDefault     = false
+
+	// tls
+	configTLSCA                 = "tls.ca"
+	configTLSCAEnv              = "CFD_TLS_CA"
+	configTLSCADefault          = ""
+	configTLSCertificate        = "tls.certificate"
+	configTLSCertificateEnv     = "CFD_TLS_CERT"
+	configTLSCertificateDefault = ""
+	configTLSKey                = "tls.key"
+	configTLSKeyEnv             = "CFD_TLS_KEY"
+	configTLSKeyDefault         = ""
+	configTLSUseForce           = "tls.force"
+	configTLSUseForceEnv        = "CFD_TLS_FORCE"
+	configTLSUseForceDefault    = false
 
 	// ca id
 	configCAID        = "ca-id"
 	configCAIDEnv     = "CFD_CA_ID"
 	configCAIDDefault = ""
-
-	// // Configuration contents
-	// configAPIClient        = "api.client"
-	// configAPIClientEnv     = "VEIL_API_CLIENT_ADDR"
-	// configAPIClientDefault = "http://127.0.0.1:8080"
-	// configAPILog           = "api.log"
-	// configAPILogEnv        = "VEIL_API_LOG"
 )
