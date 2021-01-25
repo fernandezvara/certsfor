@@ -47,7 +47,7 @@ Firebase has generous limits on its free plan so unless you are creating a big a
 
 - **Add Analytics if you think you will need them**
 
-If you select to use analytics you will be asked for the project to use or set up a new one. *This is not covered here.*
+If you select to use analytics you will be asked for the project to use or set up a new one. *Refer to the Analytics documentation.*
 
 ![Step 2. Analytics needed?](./images/firestore-2.png)
 
