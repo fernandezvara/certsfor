@@ -67,7 +67,7 @@ dockers:
       - --platform=linux/amd64
       - --build-arg=ARCH=amd64
   - image_templates:
-      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64
     dockerfile: Dockerfile
     goarch: arm64
     use_buildx: true
@@ -78,6 +78,7 @@ dockers:
       - --label=org.opencontainers.image.version={{.Version}}
       - --label=org.opencontainers.image.source={{.GitURL}}
       - --label=org.opencontainers.image.licenses=MIT
+      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
       - --platform=linux/arm64/v8
       - --build-arg=ARCH=arm64
 
@@ -85,11 +86,11 @@ docker_manifests:
   - name_template: ghcr.io/fernandezvara/cfd:{{ .Tag }}
     image_templates:
       - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
-      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64
   - name_template: ghcr.io/fernandezvara/cfd:latest
     image_templates:
       - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
-      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64
 
 nfpms:
   - file_name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
@@ -109,7 +110,7 @@ release:
   github:
     owner: fernandezvara
     name: certsfor
-  draft: true
+  draft: false
   name_template: "{{.ProjectName}}-v{{.Version}}"
 
 changelog:
