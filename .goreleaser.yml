@@ -17,7 +17,7 @@ builds:
       - amd64
       - arm
       - arm64
-    goarm: 
+    goarm:
       - 6
       - 7
     main: ./cmd/cfd
@@ -29,7 +29,7 @@ builds:
         goarch: arm
     flags:
       - -trimpath
-    ldflags: 
+    ldflags:
       - -s -w
       - -X github.com/fernandezvara/certsfor/cmd/cfd/cmd.Version={{.Version}}
 
@@ -45,88 +45,89 @@ archives:
         format: zip
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 
 snapshot:
   name_template: "{{ .Tag }}-next"
 
 dockers:
   - image_templates:
-    - "fernandezvara/cfd:{{ .Tag }}-amd64"
-    - "ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64"
+      - fernandezvara/cfd:{{ .Tag }}-amd64
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
     dockerfile: Dockerfile
     goarch: amd64
     use_buildx: true
     build_flag_templates:
-    - "--pull"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.name={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    - "--label=org.opencontainers.image.source={{.GitURL}}"
-    - "--platform=linux/amd64"
-    - "--build-arg=ARCH=amd64"
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=org.opencontainers.image.licenses=MIT
+      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+      - --platform=linux/amd64
+      - --build-arg=ARCH=amd64
   - image_templates:
-    - "fernandezvara/cfd:{{ .Tag }}-arm64v8"
-    - "ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8"
+      - fernandezvara/cfd:{{ .Tag }}-arm64v8
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
     dockerfile: Dockerfile
     goarch: arm64
     use_buildx: true
     build_flag_templates:
-    - "--pull"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.name={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    - "--label=org.opencontainers.image.source={{.GitURL}}"
-    - "--platform=linux/arm64"
-    - "--build-arg=ARCH=arm64"
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=org.opencontainers.image.licenses=MIT
+      - --platform=linux/arm64/v8
+      - --build-arg=ARCH=arm64
 
 docker_manifests:
-- name_template: 'fernandezvara/cfd:{{ .Tag }}'
-  image_templates:
-  - 'fernandezvara/cfd:{{ .Tag }}-amd64'
-  - 'fernandezvara/cfd:{{ .Tag }}-arm64v8'
-- name_template: 'ghcr.io/fernandezvara/cfd:{{ .Tag }}'
-  image_templates:
-  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64'
-  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8'
-- name_template: 'fernandezvara/cfd:latest'
-  image_templates:
-  - 'fernandezvara/cfd:{{ .Tag }}-amd64'
-  - 'fernandezvara/cfd:{{ .Tag }}-arm64v8'
-- name_template: 'ghcr.io/fernandezvara/cfd:latest'
-  image_templates:
-  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64'
-  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8'
+  - name_template: fernandezvara/cfd:{{ .Tag }}
+    image_templates:
+      - fernandezvara/cfd:{{ .Tag }}-amd64
+      - fernandezvara/cfd:{{ .Tag }}-arm64v8
+  - name_template: ghcr.io/fernandezvara/cfd:{{ .Tag }}
+    image_templates:
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
+  - name_template: fernandezvara/cfd:latest
+    image_templates:
+      - fernandezvara/cfd:{{ .Tag }}-amd64
+      - fernandezvara/cfd:{{ .Tag }}-arm64v8
+  - name_template: ghcr.io/fernandezvara/cfd:latest
+    image_templates:
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
+      - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
 
 nfpms:
-  - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    homepage:  https://www.certsfor.dev/
+  - file_name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    homepage: https://www.certsfor.dev/
     description: Easy certificate management for development environments
     maintainer: Antonio Fernández Vara <antoniofernandezvara+cfd@gmail.com>
     license: MIT
     vendor: fernandezvara
     formats:
-    - apk
-    - deb
-    - rpm
+      - apk
+      - deb
+      - rpm
     recommends:
-    - golang
+      - golang
 
 release:
   github:
     owner: fernandezvara
-    name: certsfor 
-  draft: true 
+    name: certsfor
+  draft: true
   name_template: "{{.ProjectName}}-v{{.Version}}"
 
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs'
-      - '^test'
+      - "^docs"
+      - "^test"
       - Merge pull request
       - Merge branch
       - go mod tidy
