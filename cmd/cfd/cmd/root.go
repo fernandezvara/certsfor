@@ -95,7 +95,9 @@ func initConfig() {
 	viper.SetDefault(configCAID, configCAIDDefault)
 	viper.BindEnv(configCAID, configCAIDEnv)
 
-	viper.BindEnv(configFileString, configFileStringEnv)
+	if os.Getenv("CFD_CONFIG") != "" {
+		global.cfgFile = os.Getenv("CFD_CONFIG")
+	}
 
 	if global.cfgFile != "" {
 		// Use config file from the flag.
