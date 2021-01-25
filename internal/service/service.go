@@ -134,28 +134,32 @@ func (s *Service) CertificateGet(ctx context.Context, collection, id string, rem
 
 func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string, remaining int) (certificate client.Certificate, err error) {
 
+	var (
+		caCertificate client.Certificate
+	)
+
+	// get the CA
+	err = s.store.Get(ctx, collection, "ca", &caCertificate)
+	if err != nil {
+		return
+	}
+
 	err = s.store.Get(ctx, collection, id, &certificate)
 	if err != nil {
 		return
 	}
 
 	certificate.X509Certificate, err = manager.CertificateFromPEM(certificate.Certificate)
+	certificate.CACertificate = caCertificate.Certificate
 
 	if remaining > 0 {
 		if s.IsNearToExpire(certificate, remaining) {
 
 			var (
 				ca             *manager.CA
-				caCertificate  client.Certificate
 				key            crypto.PrivateKey
 				newCertificate *x509.Certificate
 			)
-
-			// get the CA
-			err = s.store.Get(ctx, collection, "ca", &caCertificate)
-			if err != nil {
-				return
-			}
 
 			ca, err = manager.FromBytes(caCertificate.Certificate, caCertificate.Key)
 			if err != nil {
