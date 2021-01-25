@@ -25,6 +25,11 @@ func (a *API) putCertificate(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	if cn == "ca" {
+		rest.ErrorResponse(w, http.StatusConflict, "CA Certificate cannot be overwritten")
+		return
+	}
+
 	if request.DN.CN == "" {
 		request.DN.CN = cn
 	}
