@@ -31,7 +31,7 @@ db:
 
 [firebase](https://firebase.google.com/) is a backend service by Google that helps building applications.
 
-`firebase` has generous limits on its free plan so unless you are creating a big amount of certificates it will remain free *(you need to store more than 1Gb of data, write more than 20.000 docs/day or read mora than 50.000 docs/day to pass the limits)*. Review firebase [pricing](https://firebase.google.com/pricing) to get full information.
+`firebase` has generous limits on its free plan so unless you are creating a big amount of certificates it will remain free *(you need to store more than 1Gb of data, write more than 20.000 docs/day or read more than 50.000 docs/day to pass the limits)*. Review firebase [pricing](https://firebase.google.com/pricing) to get full information.
 
 ?>This database allows High Availability so you can run several API servers that will work with the same database storage (usually behind a load balancer).
 
