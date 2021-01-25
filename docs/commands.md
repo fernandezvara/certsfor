@@ -54,6 +54,7 @@ Aliases: `create certificate`, `create cert`
 | `-c`, `--cert` | Where to store the Certificate after its creation. | | |
 | `-k`, `--key` | Where to store the key file. | | |
 | `-b`, `--bundle` | Bundle file location. Some services like [NGINX](https://www.nginx.org) uses this kind of file. | | |
+| `--ca-cert` | Where to store the CA Certificate. | | |
 | `-f`, `--file` | File with the answers in YAML format. | | |
 
 ## create template
@@ -82,6 +83,7 @@ Usage `cfd get [flags]`
 | `-c`, `--cert` | Where to store the Certificate after its creation. | | |
 | `-k`, `--key` | Where to store the key file. | | |
 | `-b`, `--bundle` | Bundle file location. | | |
+| `--ca-cert` | Where to store the CA Certificate. | | |
 | `--renew` | Time (expresed as percent) to determine if the certificate must be renewed **(defaults to 20%)**. | | |
 
 ## start api

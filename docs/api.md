@@ -122,7 +122,7 @@ POST /v1/ca
     "key": "rsa:4096",
     "exp": 90,
     "client": false
-}' http://localhost:8080/v1/ca
+}' https://api.certsfor.dev:8443/v1/ca
 {"key":"BASE64","certificate":"BASE64","ca_certificate":"BASE64",
 "request":{"dn":{"cn":"myca","c":"ES","l":"MyLocality","o":"MyOrganization","ou":"MyOU",
 "p":"MyProvince","pc":"00000","st":"MyStreet"},"san":["ca.example.com","192.168.1.1"],
@@ -142,7 +142,7 @@ import (
 
 func main() {
 
-	cli, err := client.New("api.certsfor.dev:443", "", "", "")
+	cli, err := client.New("api.certsfor.dev:8443", "", "", "", true)
 	if err != nil {
 		panic(err)
 	}
@@ -275,7 +275,7 @@ PUT /v1/ca/:caid:/certificates/:common-name:
     "key": "ecdsa:521"
     "exp": 90,
     "client": false
-}' http://localhost:8080/v1/ca/a600097f-d860-4f53-9269-28f1b8bd15b8/certificates/service1
+}' https://api.certsfor.dev:8443/v1/ca/a600097f-d860-4f53-9269-28f1b8bd15b8/certificates/service1
 {"key":"BASE64","certificate":"BASE64","ca_certificate":"BASE64",
 "request":{"dn":{"cn":"service1","c":"ES","l":"MyLocality","o":"MyOrganization","ou":"MyOU",
 "p":"MyProvince","pc":"00000","st":"MyStreet"},"san":["service1.example.com","192.168.1.2"],
@@ -295,7 +295,7 @@ import (
 
 func main() {
 
-	cli, err := client.New("api.certsfor.dev:443", "", "", "")
+	cli, err := client.New("api.certsfor.dev:8443", "", "", "", true)
 	if err != nil {
 		panic(err)
 	}
@@ -339,7 +339,7 @@ GET /v1/ca/:caid:/certificates/:common-name:?renew=XX
 ```
 
 >[!NOTE]
->Renewal is automatically done retriving it to simplify the workflow. If not expecified it will be renewed if time to expire is (20% or less than certificate lifetime).
+>Renewal is done automatically on retrieving to simplify the workflow. If not specified it will be renewed if the time to expire is (20% or less than certificate lifetime).
 
 <!-- tabs:start -->
 
@@ -389,30 +389,27 @@ GET /v1/ca/:caid:/certificates/:common-name:?renew=XX
 
 #### **Curl**
 
+##### Basic Usage
+
 ```bash
->>curl -X PUT -d '{ 
-    "dn": {
-        "cn": "service1",
-        "c": "ES",
-        "l": "MyLocality",
-        "o": "MyOrganization",
-        "ou": "MyOU",
-        "p": "MyProvince",
-        "pc": "00000",
-        "st": "MyStreet"
-    },
-    "san": [
-        "service1.example.com",
-        "192.168.1.2"
-    ],
-    "key": "ecdsa:521"
-    "exp": 90,
-    "client": false
-}' http://localhost:8080/v1/ca/a600097f-d860-4f53-9269-28f1b8bd15b8/certificates/service1
+>>curl https://api.certsfor.dev:8443/v1/ca/a600097f-d860-4f53-9269-28f1b8bd15b8/certificates/service1
 {"key":"BASE64","certificate":"BASE64","ca_certificate":"BASE64",
 "request":{"dn":{"cn":"service1","c":"ES","l":"MyLocality","o":"MyOrganization","ou":"MyOU",
 "p":"MyProvince","pc":"00000","st":"MyStreet"},"san":["service1.example.com","192.168.1.2"],
 "key":"ecdsa:521","exp":90,"client":false}}
+```
+
+##### Save files
+
+```bash
+# certificate
+curl -X GET https://api.certsfor.dev:8443/v1/ca/a600097f-d860-4f53-9269-28f1b8bd15b8/certificates/service1 
+| jq '.certificate' -r | base64 -d > cert.crt
+
+
+# key
+curl -X GET https://api.certsfor.dev:8443/v1/ca/a600097f-d860-4f53-9269-28f1b8bd15b8/certificates/service1 
+| jq '.key' -r | base64 -d > key.crt
 ```
 
 #### **Go**
@@ -428,38 +425,22 @@ import (
 
 func main() {
 
-	cli, err := client.New("api.certsfor.dev:443", "", "", "")
+	cli, err := client.New("api.certsfor.dev:8443", "", "", "", true)
 	if err != nil {
 		panic(err)
 	}
 
-	requestService1 := client.APICertificateRequest{
-		DN: client.APIDN{
-			CN: "service1",
-			C:  "ES",
-			L:  "MyLocality",
-			O:  "MyOrganization",
-			OU: "MyOU",
-			P:  "MyProvince",
-			PC: "00000",
-			ST: "MyStreet",
-		},
-		SAN: []string{
-			"service1.example.com",
-			"192.168.1.2",
-		},
-		Key:            "ecdsa:521",
-		ExpirationDays: 90,
-		Client:         false,
-	}
+	var cert client.Certificate
 
-	cert, err := cli.CertificateCreate("a600097f-d860-4f53-9269-28f1b8bd15b8", "service1", requestService1)
+	cert, err = cli.CertificateGet("a600097f-d860-4f53-9269-28f1b8bd15b8", "service1", 20)
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Println(string(cert.CACertificate))
 	fmt.Println(string(cert.Certificate))
-    
+	fmt.Println(string(cert.Key))
+
 }
 ```
 
