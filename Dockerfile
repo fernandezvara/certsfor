@@ -1,4 +1,6 @@
-FROM alpine:latest
+ARG ARCH
+
+FROM multiarch/alpine:${ARCH}-latest-stable
 
 EXPOSE 8080
 
@@ -17,9 +19,6 @@ ENV CFD_TLS_FORCE ""
 ENV CFD_CA_ID ""
 
 COPY cfd /usr/local/bin/
-# RUN chmod +x /usr/local/bin/cfd
-
-RUN /usr/local/bin/cfd --config="/etc/cfd/config.yaml" configfile
 
 ENTRYPOINT ["/usr/local/bin/cfd"]
 CMD [ "--help" ]

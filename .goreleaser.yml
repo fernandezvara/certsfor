@@ -12,13 +12,21 @@ builds:
       - linux
       - windows
       - darwin
+      - freebsd
     goarch:
-      - 386
       - amd64
       - arm
       - arm64
+    goarm: 
+      - 6
+      - 7
     main: ./cmd/cfd
     binary: cfd
+    ignore:
+      - goos: freebsd
+        goarch: arm64
+      - goos: freebsd
+        goarch: arm
     flags:
       - -trimpath
     ldflags: 
@@ -57,6 +65,7 @@ dockers:
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--label=org.opencontainers.image.source={{.GitURL}}"
     - "--platform=linux/amd64"
+    - "--build-arg=ARCH=amd64"
   - image_templates:
     - "fernandezvara/cfd:{{ .Tag }}-arm64v8"
     - "ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8"
@@ -70,7 +79,8 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--label=org.opencontainers.image.source={{.GitURL}}"
-    - "--platform=linux/arm64/v8"
+    - "--platform=linux/arm64"
+    - "--build-arg=ARCH=arm64"
 
 docker_manifests:
 - name_template: 'fernandezvara/cfd:{{ .Tag }}'
