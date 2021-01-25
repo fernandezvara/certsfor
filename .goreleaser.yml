@@ -1,0 +1,122 @@
+project_name: cfd
+
+before:
+  hooks:
+    - go mod download
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    main: ./cmd/cfd
+    binary: cfd
+    flags:
+      - -trimpath
+    ldflags: 
+      - -s -w
+      - -X github.com/fernandezvara/certsfor/cmd/cfd/cmd.Version={{.Version}}
+
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+dockers:
+  - image_templates:
+    - "fernandezvara/cfd:{{ .Tag }}-amd64"
+    - "ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64"
+    dockerfile: Dockerfile
+    goarch: amd64
+    use_buildx: true
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.name={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.source={{.GitURL}}"
+    - "--platform=linux/amd64"
+  - image_templates:
+    - "fernandezvara/cfd:{{ .Tag }}-arm64v8"
+    - "ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8"
+    dockerfile: Dockerfile
+    goarch: arm64
+    use_buildx: true
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.name={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.source={{.GitURL}}"
+    - "--platform=linux/arm64/v8"
+
+docker_manifests:
+- name_template: 'fernandezvara/cfd:{{ .Tag }}'
+  image_templates:
+  - 'fernandezvara/cfd:{{ .Tag }}-amd64'
+  - 'fernandezvara/cfd:{{ .Tag }}-arm64v8'
+- name_template: 'ghcr.io/fernandezvara/cfd:{{ .Tag }}'
+  image_templates:
+  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64'
+  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8'
+- name_template: 'fernandezvara/cfd:latest'
+  image_templates:
+  - 'fernandezvara/cfd:{{ .Tag }}-amd64'
+  - 'fernandezvara/cfd:{{ .Tag }}-arm64v8'
+- name_template: 'ghcr.io/fernandezvara/cfd:latest'
+  image_templates:
+  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64'
+  - 'ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8'
+
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    homepage:  https://www.certsfor.dev/
+    description: Easy certificate management for development environments
+    maintainer: Antonio Fernández Vara <antoniofernandezvara+cfd@gmail.com>
+    license: MIT
+    vendor: fernandezvara
+    formats:
+    - apk
+    - deb
+    - rpm
+    recommends:
+    - golang
+
+release:
+  github:
+    owner: fernandezvara
+    name: certsfor 
+  draft: true 
+  name_template: "{{.ProjectName}}-v{{.Version}}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs'
+      - '^test'
+      - Merge pull request
+      - Merge branch
+      - go mod tidy

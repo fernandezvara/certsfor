@@ -16,3 +16,4 @@
 
 *.pem
 cmd/cfd/*.yaml
+dist/
