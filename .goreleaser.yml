@@ -52,7 +52,6 @@ snapshot:
 
 dockers:
   - image_templates:
-      - fernandezvara/cfd:{{ .Tag }}-amd64
       - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
     dockerfile: Dockerfile
     goarch: amd64
@@ -68,7 +67,6 @@ dockers:
       - --platform=linux/amd64
       - --build-arg=ARCH=amd64
   - image_templates:
-      - fernandezvara/cfd:{{ .Tag }}-arm64v8
       - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
     dockerfile: Dockerfile
     goarch: arm64
@@ -84,18 +82,10 @@ dockers:
       - --build-arg=ARCH=arm64
 
 docker_manifests:
-  - name_template: fernandezvara/cfd:{{ .Tag }}
-    image_templates:
-      - fernandezvara/cfd:{{ .Tag }}-amd64
-      - fernandezvara/cfd:{{ .Tag }}-arm64v8
   - name_template: ghcr.io/fernandezvara/cfd:{{ .Tag }}
     image_templates:
       - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
       - ghcr.io/fernandezvara/cfd:{{ .Tag }}-arm64v8
-  - name_template: fernandezvara/cfd:latest
-    image_templates:
-      - fernandezvara/cfd:{{ .Tag }}-amd64
-      - fernandezvara/cfd:{{ .Tag }}-arm64v8
   - name_template: ghcr.io/fernandezvara/cfd:latest
     image_templates:
       - ghcr.io/fernandezvara/cfd:{{ .Tag }}-amd64
