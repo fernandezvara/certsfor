@@ -49,6 +49,7 @@ To operate with the new created CA, you must be pass this ID on each request.`,
 func init() {
 	createCmd.AddCommand(createCertificateCmd)
 	createCertificateCmd.Flags().StringVarP(&global.certFile, "cert", "c", "", "Certificate file location.")
+	createCertificateCmd.Flags().StringVar(&global.caCertFile, "ca-cert", "", "CA Certificate file location.")
 	createCertificateCmd.Flags().StringVarP(&global.bundleFile, "bundle", "b", "", "Bundle file location.")
 	createCertificateCmd.Flags().StringVarP(&global.keyFile, "key", "k", "", "Key file location. NOTE: Do not share this file.")
 	createCertificateCmd.Flags().StringVarP(&global.filename, "file", "f", "", "File with the answers in YAML format.")

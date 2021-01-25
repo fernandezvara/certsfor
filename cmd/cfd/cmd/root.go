@@ -37,7 +37,8 @@ var rootCmd = &cobra.Command{
 	Long: `
 'cfd' is a tool for certificate workflow for development environments.
 	
-Full documentation: https://certsfor.dev/`,
+Full documentation: https://www.certsfor.dev/
+`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -51,7 +52,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&global.cfgFile, "config", configFileStringDefault, "config file")
+	rootCmd.PersistentFlags().StringVar(&global.cfgFile, configFileString, configFileStringDefault, "config file")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -89,8 +90,7 @@ func initConfig() {
 	viper.SetDefault(configCAID, configCAIDDefault)
 	viper.BindEnv(configCAID, configCAIDEnv)
 
-	// viper.SetDefault(config, configDefault)
-	// viper.BindEnv(config, configEnv)
+	viper.BindEnv(configFileString, configFileStringEnv)
 
 	if global.cfgFile != "" {
 		// Use config file from the flag.

@@ -39,6 +39,7 @@ type globalConfig struct {
 	cfgFile    string // configuration file location
 	filename   string // file to parse/store/execute the action
 	certFile   string // certificate file location
+	caCertFile string // ca certificate file location
 	bundleFile string // bundle file location
 	keyFile    string // key file location
 	collection string // ca id <-> colelction

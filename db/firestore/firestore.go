@@ -7,7 +7,10 @@ import (
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/fernandezvara/certsfor/db/store"
+	"github.com/fernandezvara/rest"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
 func init() {
@@ -58,6 +61,10 @@ func (f Firestore) Get(ctx context.Context, collection, id string, value interfa
 	var dsnap *firestore.DocumentSnapshot
 
 	dsnap, err = f.client.Collection(collection).Doc(id).Get(ctx)
+	if grpc.Code(err) == codes.NotFound {
+		return rest.ErrNotFound
+	}
+
 	if err != nil {
 		return
 	}

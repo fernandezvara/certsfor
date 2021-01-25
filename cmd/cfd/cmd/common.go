@@ -133,4 +133,8 @@ func saveFiles(ca, bytesCert, bytesKey []byte) {
 		er(ioutil.WriteFile(global.bundleFile, append(bytesCert, ca...), 0400))
 	}
 
+	if global.caCertFile != "" {
+		er(ioutil.WriteFile(global.caCertFile, ca, 0400))
+	}
+
 }

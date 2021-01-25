@@ -42,6 +42,7 @@ var getCertificateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(getCertificateCmd)
 	getCertificateCmd.Flags().StringVarP(&global.certFile, "cert", "c", "", "Certificate file location.")
+	getCertificateCmd.Flags().StringVar(&global.caCertFile, "ca-cert", "", "CA Certificate file location.")
 	getCertificateCmd.Flags().StringVarP(&global.bundleFile, "bundle", "b", "", "Bundle file location.")
 	getCertificateCmd.Flags().StringVarP(&global.keyFile, "key", "k", "", "Key file location.")
 	getCertificateCmd.Flags().StringVar(&global.collection, "ca-id", "", "CA Identifier. (required). [$CFD_CA_ID]")

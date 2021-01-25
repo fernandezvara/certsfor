@@ -8,6 +8,7 @@ import (
 
 	"github.com/dgraph-io/badger"
 	"github.com/fernandezvara/certsfor/db/store"
+	"github.com/fernandezvara/rest"
 )
 
 func init() {
@@ -79,6 +80,10 @@ func (b Badger) Get(ctx context.Context, collection, id string, value interface{
 		return err
 
 	})
+
+	if err == badger.ErrKeyNotFound {
+		return rest.ErrNotFound
+	}
 
 	err = json.Unmarshal(v, value)
 
