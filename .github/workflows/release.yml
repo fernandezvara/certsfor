@@ -26,4 +26,5 @@ jobs:
           version: latest
           args: release --rm-dist
         env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
