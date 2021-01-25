@@ -37,7 +37,7 @@ db:
 
 #### Database creation
 
-- First, you need to register in firebase, if you have a Google account it will be a straigh forward step.
+- First, you need to register in Firebase; if you have a Google account it will be a straight forward step.
 
 - Go to the Console, and you will be prompted with a 'Create a new Project', click it. A wizard will guide you in the process.
 
