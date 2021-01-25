@@ -186,9 +186,11 @@ PUT /v1/ca/:caid:/certificates/:common-name:
 ```
 
 >[!ATTENTION]
->Updating a certificate does not renew it, **it makes a new pair combination from scratch**. Renewal is done retriving it to simplify the workflow.
+>Updating a certificate does not renew it, **it makes a new pair combination from scratch**. Be sure to don't overwrite certificates. Common Name is used as ID.
 >
->Be sure to don't overwrite certificates. Common Name is used as ID.
+>Renewal is done retriving the certificate simplifying the workflow.
+>
+>**CA Certificate cannot be updated**, it will fail with Conflict HTTP error code. CA certificates are always stored as 'ca'.
 
 <!-- tabs:start -->
 
@@ -341,6 +343,9 @@ GET /v1/ca/:caid:/certificates/:common-name:?renew=XX
 >[!NOTE]
 >Renewal is done automatically on retrieving to simplify the workflow. If not specified it will be renewed if the time to expire is (20% or less than certificate lifetime).
 
+>[!NOTE]
+>To retrieve the CA certificate use *ca* as common name when calling the API
+
 <!-- tabs:start -->
 
 #### **Request**
@@ -446,31 +451,71 @@ func main() {
 
 <!-- tabs:end -->
 
-
-
-
-``` 
-		"GET": {
-			"/status": {
-				Handler: a.getStatus,
-				Matcher: []string{""},
-			},
-			"/v1/ca/:caid/certificates/:cn": {
-				Handler: a.getCertificate,
-				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_]+"},
-			},
-		},
-		"POST": {
-			"/v1/ca": {
-				Handler: a.postCA,
-				Matcher: []string{"", ""},
-			},
-		},
-		"PUT": {
-			"/v1/ca/:caid/certificates/:cn": {
-				Handler: a.putCertificate,
-				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_]+"},
-			},
-		},
+## Status
 
 ```
+GET /status
+```
+
+<!-- tabs:start -->
+
+#### **Request**
+
+**Parameters**
+
+There are not parameters for this endpoint.
+
+#### **Responses**
+
+| Code | Description |
+| ---- | ----------- |
+| 200  | API is ok |
+| 500  | There is an error on the API |
+
+**Body**
+
+```json
+{
+    "version":"0.1"
+}
+```
+
+#### **Curl**
+
+##### Basic Usage
+
+```bash
+>>curl https://api.certsfor.dev:8443/status
+{"version":"0.1"}
+```
+
+#### **Go**
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/fernandezvara/certsfor/pkg/client"
+)
+
+func main() {
+
+	cli, err := client.New("api.certsfor.dev:8443", "", "", "", true)
+	if err != nil {
+		panic(err)
+	}
+
+    status, err := cli.Status()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(status.Version)
+
+}
+```
+
+<!-- tabs:end -->
+
