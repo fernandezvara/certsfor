@@ -63,7 +63,7 @@ Aliases: `create certificate`, `create cert`
 >[!NOTE|label:Output to console]
 >Certificate, key, CA certificate, bundle and PFX files can be echoed to console by using `out` or `stdout` as value.
 >
-> Ex: `cdf create cert -f ./template.yaml -c stdout
+> Ex: `cdf create cert -f ./template.yaml -c stdout`
 
 ## create template
 
