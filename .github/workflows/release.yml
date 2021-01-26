@@ -2,6 +2,11 @@ name: goreleaser
 
 on:
   push:
+    branches:
+      - 'main'
+    tags:
+      - '*'
+  pull_request:
 
 jobs:
   goreleaser:
@@ -14,10 +19,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      -
-        name: Allow arm Docker builds # https://github.com/linuxkit/linuxkit/tree/master/pkg/binfmt
-        run: sudo docker run --privileged linuxkit/binfmt:v0.8
 
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        
       -
         name: Set up Go
         uses: actions/setup-go@v2
