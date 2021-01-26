@@ -2,9 +2,20 @@ ARG ARCH
 
 FROM multiarch/alpine:${ARCH}-latest-stable
 
-EXPOSE 8080
+ARG USER=cfd
+ENV HOME /home/${USER}
 
-ENV CFD_CONFIG /etc/cfd/config.yaml
+RUN apk add --no-cache bash
+RUN adduser -D -s /bin/bash ${USER}
+
+USER ${USER}
+WORKDIR ${HOME}
+
+# binary
+COPY cfd /usr/local/bin/
+
+# cfd variables
+ENV CFD_CONFIG ${HOME}/.cfd/config.yaml
 ENV CFD_DB_TYPE ""
 ENV CFD_DB_CONNECTION ""
 ENV CFD_API_ENABLED ""
@@ -18,7 +29,7 @@ ENV CFD_TLS_KEY ""
 ENV CFD_TLS_FORCE ""
 ENV CFD_CA_ID ""
 
-COPY cfd /usr/local/bin/
+EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/cfd"]
 CMD [ "--help" ]
