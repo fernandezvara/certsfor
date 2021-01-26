@@ -12,14 +12,15 @@ Manage multiple CA without hassle. Automate different environments or servers wi
 
 ### Using docker
 
-If you have `docker` installed you can just copy and paste this snippet to follow the guide. This will open an interactive console where operate the command.
-
+>If you have `docker` installed you can just copy and paste this snippet to follow the guide. This will open an interactive console where operate the command.
+>
 ```bash
-docker run -v $HOME/cfd:/home/cfd/.cfd -i ghcr.io/fernandezvara/cfd:latest /bin/bash
+docker run -v $HOME/.cfd:/home/cfd/.cfd --entrypoint /bin/bash -it ghcr.io/fernandezvara/cfd:latest
 ```
-
->[!NOTE]
->A directory on the home directory `$HOME/cfd` is created where the configuration and default database will be stored. This allows persistence while using the container. Customize *this local directory* to meet your needs.
+>[!NOTE|label:Quick-Start with docker]
+>A directory on the home directory `$HOME/.cfd` is created where the configuration and default database will be stored. This allows persistence while using the container or the binary.
+>
+>You can customize *this local directory* to meet your needs.
 
 ### Using a binary
 
