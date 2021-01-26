@@ -11,6 +11,8 @@ Global Flags:
 
 ## configfile
 
+**Usage:** `cfd configfile`
+
 By default, the tool comes configured with sane defaults to start working, so there is not configuration file needed. If you are a solo developer probably you won't need to change anything.
 
 Default configuration file is `$HOME/.cfd/config.yaml` and default database will be created on `$HOME/.cfd/db`. You can use other configuration file by using the global flag `--config`.
@@ -21,7 +23,7 @@ Creates a new Certification Authority based on the answers received, interactive
 
 By using template files you can automate all certificate creation.
 
-Usage: `cfd create ca [flags]`
+**Usage:** `cfd create ca [flags]`
 
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | -------- |
@@ -43,9 +45,7 @@ Usage: `cfd create ca [flags]`
 
 Certificate creation expects the same answers than the CA.
 
-Flags allows to set where to store a bundle certificate file, used in some services like [NGINX](https://www.nginx.org/), certificate and/or key files.
-
-Usage: `cfd create certificate [flags]`
+**Usage:** `cfd create certificate [flags]`
 
 Aliases: `create certificate`, `create cert`
 
@@ -69,20 +69,20 @@ Aliases: `create certificate`, `create cert`
 
 Writes an empty certificate creation template as YAML file.
 
-Usage: `cfd create template [flags]`
+**Usage:** `cfd create template [flags]`
 
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | :------: |
 | `--ca` | Template is for a CA | | |
 | `-f`, `--file` | Where to store the template file in YAML format. If not provided  | | |
 
-## get
+## get certificate / get cert
 
 Retrieve any certificate using its Common Name as Identifier. This command will get the certificate stored on the database if valid or will get a new updated one.
 
 By default, when a certificate is retrieved using the cli, it will ask the CA to renew it if the time remaining for its expiration is less than the desired percent.
 
-Usage `cfd get [flags]`
+**Usage:** `cfd get certificate [flags]`
 
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | :------: |
@@ -99,16 +99,16 @@ Usage `cfd get [flags]`
 >[!NOTE|label:Output to console]
 >Certificate, key, CA certificate, bundle and PFX files can be echoed to console by using `out` or `stdout` as value.
 >
-> Ex: `cdf get cert --ca-id <uuid> --cn <common-name> -c stdout
+> Ex: `cdf get cert --ca-id <uuid> --cn <common-name> -c stdout`
 
 ## start api
 
 Starts cfd in daemon-mode. This mode allows remote cfd clients or simple call (like curl) usage.
 
-Usage `cfd start api`
+**Usage:** `cfd start api`
 
 > [!ATTENTION]
-> By default API does not have any security applied, so its recommended to create certificates to secure the communication on transit.
+> By default API **does not have any security applied**, so its recommended to create certificates to secure the communication on transit, before its use.
 
 Refer to the [API endpoints documentation](api.md) for its usage.
 
@@ -122,7 +122,7 @@ Starts a simple webserver that serves files from the selected directory using a 
 
 By default webserver serves the files in the current directory, listen in all IPs and TPC port 8443. If certificate needs to be renewed it defaults to a 20% lifetime.
 
-Usage `cfd start webserver [flags]`
+**Usage:** `cfd start webserver [flags]`
 
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | :------: |
@@ -134,7 +134,7 @@ Usage `cfd start webserver [flags]`
 
 ## status
 
-Usage: `cfd status`
+**Usage:** `cfd status`
 
 Checks if service is usable. If it's operating in a local mode it will open the database and make a simple test to ensure it's ok.
 
