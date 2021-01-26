@@ -35,20 +35,22 @@ var Version = "0.1"
 
 // global variables
 type globalConfig struct {
-	home       string // $HOME
-	cfgFile    string // configuration file location
-	filename   string // file to parse/store/execute the action
-	certFile   string // certificate file location
-	caCertFile string // ca certificate file location
-	bundleFile string // bundle file location
-	keyFile    string // key file location
-	collection string // ca id <-> colelction
-	cn         string // common name as argument
-	bool1      bool   // common bool option
-	remaining  int    // remaining percert (integer) for expiration
-	listen     string // webserver ip:port to listen
-	root       string // webserver root
-	quiet      bool   // run in quiet mode
+	home        string // $HOME
+	cfgFile     string // configuration file location
+	filename    string // file to parse/store/execute the action
+	certFile    string // certificate file location
+	caCertFile  string // ca certificate file location
+	bundleFile  string // bundle file location
+	keyFile     string // key file location
+	collection  string // ca id <-> colelction
+	cn          string // common name as argument
+	bool1       bool   // common bool option
+	remaining   int    // remaining percert (integer) for expiration
+	listen      string // webserver ip:port to listen
+	root        string // webserver root
+	quiet       bool   // run in quiet mode
+	pfxFile     string // pfx file to save
+	pfxPassword string // password for pfx file
 }
 
 // detect home folder

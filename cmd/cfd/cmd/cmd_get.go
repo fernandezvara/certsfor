@@ -49,6 +49,8 @@ func init() {
 	getCertificateCmd.Flags().StringVar(&global.collection, "ca-id", "", "CA Identifier. (required). [$CFD_CA_ID]")
 	getCertificateCmd.Flags().StringVar(&global.cn, "cn", "", "Common Name. (required).")
 	getCertificateCmd.Flags().IntVar(&global.remaining, "renew", 20, "Time (expresed as percent) to be used to determine if the certificate must be renewed (defaults to 20 %). Key remains the same.")
+	getCertificateCmd.Flags().StringVar(&global.pfxFile, "pfx", "", "pfx file location")
+	getCertificateCmd.Flags().StringVar(&global.pfxPassword, "pfx-password", "changeit", "pfx password")
 	getCertificateCmd.MarkFlagRequired("cn")
 }
 

@@ -53,6 +53,8 @@ func init() {
 	createCertificateCmd.Flags().StringVarP(&global.keyFile, "key", "k", "", "Key file location. NOTE: Do not share this file.")
 	createCertificateCmd.Flags().StringVarP(&global.filename, "file", "f", "", "File with the answers in YAML format.")
 	createCertificateCmd.Flags().StringVar(&global.collection, "ca-id", "", "CA Identifier. (required). [$CFD_CA_ID]")
+	createCertificateCmd.Flags().StringVar(&global.pfxFile, "pfx", "", "pfx file location")
+	createCertificateCmd.Flags().StringVar(&global.pfxPassword, "pfx-password", "changeit", "pfx password")
 }
 
 func createCertificateFunc(cmd *cobra.Command, args []string) {

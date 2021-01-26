@@ -47,4 +47,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	honnef.co/go/tools v0.1.1 // indirect
+	software.sslmate.com/src/go-pkcs12 v0.0.0-20201103104416-57fc603b7f52
 )

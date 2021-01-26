@@ -23,6 +23,9 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"crypto/rand"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -30,6 +33,7 @@ import (
 
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/spf13/viper"
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func caTemplate() (request client.APICertificateRequest) {
@@ -121,6 +125,36 @@ func collectionOrExit() (collection string) {
 
 func saveFiles(ca, bytesCert, bytesKey []byte) {
 
+	var (
+		pfxData                          []byte
+		blockCert, blockCaCert, blockKey *pem.Block
+		cert, caCert                     *x509.Certificate
+		key                              interface{}
+		err                              error
+	)
+
+	// pkcs12
+	if global.pfxFile != "" {
+
+		blockCert, _ = pem.Decode(bytesCert)
+		cert, err = x509.ParseCertificate(blockCert.Bytes)
+		er(err)
+
+		blockCaCert, _ = pem.Decode(ca)
+		caCert, err = x509.ParseCertificate(blockCaCert.Bytes)
+		er(err)
+
+		blockKey, _ = pem.Decode(bytesKey)
+		key, err = x509.ParsePKCS8PrivateKey(blockKey.Bytes)
+		er(err)
+
+		pfxData, err = pkcs12.Encode(rand.Reader, key, cert, []*x509.Certificate{caCert}, global.pfxPassword)
+		er(err)
+
+		saveOrShowFile(global.pfxFile, pfxData, 0400)
+
+	}
+
 	saveOrShowFile(global.certFile, bytesCert, 0400)
 	saveOrShowFile(global.keyFile, bytesKey, 0400)
 	saveOrShowFile(global.bundleFile, append(bytesCert, ca...), 0400)
@@ -132,7 +166,7 @@ func saveOrShowFile(file string, contents []byte, perm os.FileMode) {
 
 	switch file {
 	case "out", "stdout":
-		fmt.Println(string(contents))
+		fmt.Print(string(contents))
 	case "":
 		// do nothing
 	default:
