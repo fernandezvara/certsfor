@@ -119,6 +119,7 @@ changelog:
     exclude:
       - "^docs"
       - "^test"
+      - "^ci"
       - Merge pull request
       - Merge branch
       - go mod tidy

@@ -2,8 +2,6 @@ name: goreleaser
 
 on:
   push:
-    tags:
-      - '*'
 
 jobs:
   goreleaser:
@@ -36,11 +34,21 @@ jobs:
      
       -
         name: Run GoReleaser
-        if: success()
+        if: success() && startsWith(github.ref, 'refs/tags/v')
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
           args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      -
+        name: Run GoReleaser Snapshot
+        if: success() && !startsWith(github.ref, 'refs/tags/v')
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
