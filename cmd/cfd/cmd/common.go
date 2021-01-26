@@ -121,20 +121,22 @@ func collectionOrExit() (collection string) {
 
 func saveFiles(ca, bytesCert, bytesKey []byte) {
 
-	if global.certFile != "" {
-		er(ioutil.WriteFile(global.certFile, bytesCert, 0400))
-	}
+	saveOrShowFile(global.certFile, bytesCert, 0400)
+	saveOrShowFile(global.keyFile, bytesKey, 0400)
+	saveOrShowFile(global.bundleFile, append(bytesCert, ca...), 0400)
+	saveOrShowFile(global.caCertFile, ca, 0400)
 
-	if global.keyFile != "" {
-		er(ioutil.WriteFile(global.keyFile, bytesKey, 0400))
-	}
+}
 
-	if global.bundleFile != "" {
-		er(ioutil.WriteFile(global.bundleFile, append(bytesCert, ca...), 0400))
-	}
+func saveOrShowFile(file string, contents []byte, perm os.FileMode) {
 
-	if global.caCertFile != "" {
-		er(ioutil.WriteFile(global.caCertFile, ca, 0400))
+	switch file {
+	case "out", "stdout":
+		fmt.Println(string(contents))
+	case "":
+		// do nothing
+	default:
+		er(ioutil.WriteFile(file, contents, perm))
 	}
 
 }

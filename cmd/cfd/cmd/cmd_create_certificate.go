@@ -40,9 +40,9 @@ var createCertificateCmd = &cobra.Command{
 	Short:   "Creates a new certificate/key pair.",
 	Long: `Creates a new certificate/key pair.
 	
-Every CA is identified by a UUID. 
+Every CA is identified by a UUID. To operate with the CA, you must be pass this ID on each request.
 
-To operate with the new created CA, you must be pass this ID on each request.`,
+To write to the standard output (console) the file contents (cert, key, bundle, ca-cert) use 'out' or 'stdout'.`,
 	Run: createCertificateFunc,
 }
 

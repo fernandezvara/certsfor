@@ -35,8 +35,10 @@ import (
 var getCertificateCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Get a certificate/key from the store.",
-	Long:  `Get a certificate/key from the store.`,
-	Run:   getCertificateFunc,
+	Long: `Get a certificate/key from the store.
+	
+To write to the standard output (console) the file contents (cert, key, bundle, ca-cert) use 'out' or 'stdout'.`,
+	Run: getCertificateFunc,
 }
 
 func init() {
