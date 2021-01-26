@@ -18,7 +18,7 @@ Manage multiple CA without hassle. Automate different environments or servers wi
 # prepare local directory # this will allow file and directory creation
 mkdir -p $HOME/.cfd && chmod 777 $HOME/.cfd
 
-# run a interactive console to try
+# run an interactive console to try
 docker run -v $HOME/.cfd:/home/cfd/.cfd --entrypoint /bin/bash -it ghcr.io/fernandezvara/cfd:latest
 ```
 
