@@ -53,12 +53,12 @@ func getStatusFunc(cmd *cobra.Command, args []string) {
 
 	status, err := srv.Status()
 
-	fmt.Println("Versions:")
+	echo("Versions:")
 	if err != nil {
-		fmt.Printf("  Client: %s\n\nError Connecting to Server: %s\n", Version, err.Error())
+		echo(fmt.Sprintf("  Client: %s\n\nError Connecting to Server: %s\n", Version, err.Error()))
 		return
 	}
 
-	fmt.Printf("  Client: %s\n  Server: %s\n", Version, status.Version)
+	echo(fmt.Sprintf("  Client: %s\n  Server: %s\n", Version, status.Version))
 
 }

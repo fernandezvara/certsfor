@@ -24,7 +24,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/fernandezvara/certsfor/internal/service"
@@ -96,6 +95,6 @@ func createCertificateFunc(cmd *cobra.Command, args []string) {
 
 	saveFiles(bytesCA, bytesCert, bytesKey)
 
-	fmt.Println("\n\nCertificate Created.")
+	echo("\n\nCertificate Created.")
 
 }

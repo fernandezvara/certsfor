@@ -48,6 +48,7 @@ type globalConfig struct {
 	remaining  int    // remaining percert (integer) for expiration
 	listen     string // webserver ip:port to listen
 	root       string // webserver root
+	quiet      bool   // run in quiet mode
 }
 
 // detect home folder
@@ -83,6 +84,11 @@ var (
 	configFileString        = "config"
 	configFileStringEnv     = "CFD_CONFIG"
 	configFileStringDefault string
+
+	configQuiet             = "quiet"
+	configQuietShort        = "q"
+	configQuietEnv          = "CFD_QUIET"
+	configQuietDefault bool = false
 
 	// database config
 	configDBType                    = "db.type"

@@ -24,7 +24,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/pkg/client"
@@ -73,6 +72,6 @@ func getCertificateFunc(cmd *cobra.Command, args []string) {
 
 	saveFiles(cert.CACertificate, cert.Certificate, cert.Key)
 
-	fmt.Println("\n\nCertificate Retrieved.")
+	echo("\n\nCertificate Retrieved.")
 
 }

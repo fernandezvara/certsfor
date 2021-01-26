@@ -112,7 +112,7 @@ func collectionOrExit() (collection string) {
 	}
 
 	if collection == "" {
-		fmt.Println("\n\nCA ID missing. Cannot continue.")
+		echo("\n\nCA ID missing. Cannot continue.")
 		os.Exit(1)
 	}
 
@@ -139,4 +139,10 @@ func saveOrShowFile(file string, contents []byte, perm os.FileMode) {
 		er(ioutil.WriteFile(file, contents, perm))
 	}
 
+}
+
+func echo(message string) {
+	if !global.quiet {
+		fmt.Println(message)
+	}
 }

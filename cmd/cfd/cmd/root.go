@@ -52,7 +52,8 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&global.cfgFile, configFileString, configFileStringDefault, "config file")
+	rootCmd.PersistentFlags().StringVar(&global.cfgFile, configFileString, configFileStringDefault, "Configuration file")
+	rootCmd.PersistentFlags().BoolVarP(&global.quiet, configQuiet, configQuietShort, configQuietDefault, "Supress the command output")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -95,6 +96,20 @@ func initConfig() {
 	viper.SetDefault(configCAID, configCAIDDefault)
 	viper.BindEnv(configCAID, configCAIDEnv)
 
+	// quiet mode
+	viper.SetDefault(configQuiet, configQuietDefault)
+	viper.BindEnv(configQuiet, configQuietEnv)
+
+	global.quiet = viper.GetBool(configQuiet)
+
+	// force quiet mode? when echoing to stdout we must clean the output
+	if global.certFile == "out" || global.certFile == "stdout" ||
+		global.keyFile == "out" || global.keyFile == "stdout" ||
+		global.bundleFile == "out" || global.bundleFile == "stdout" ||
+		global.caCertFile == "out" || global.caCertFile == "stdout" {
+		global.quiet = true
+	}
+
 	if os.Getenv("CFD_CONFIG") != "" {
 		global.cfgFile = os.Getenv("CFD_CONFIG")
 	}
@@ -112,7 +127,7 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		echo(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
 	}
 }
 

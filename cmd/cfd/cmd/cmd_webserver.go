@@ -120,7 +120,7 @@ func webserverFunc(cmd *cobra.Command, args []string) {
 	go func() {
 		if err = httpServer.ListenAndServeTLS("", ""); err != nil {
 			if err != http.ErrServerClosed {
-				fmt.Println("Error on WebServer", err.Error())
+				echo(fmt.Sprintf("Error on WebServer: %s", err.Error()))
 				os.Exit(1)
 			}
 		}

@@ -89,6 +89,6 @@ func createCaFunc(cmd *cobra.Command, args []string) {
 
 	saveFiles([]byte{}, bytesCert, bytesKey)
 
-	fmt.Printf("\n\nCA Created. ID: '%s'\n", id)
+	echo(fmt.Sprintf("\n\nCA Created. ID: '%s'\n", id))
 
 }

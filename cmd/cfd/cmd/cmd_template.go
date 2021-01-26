@@ -69,6 +69,6 @@ func templateFunc(cmd *cobra.Command, args []string) {
 
 	er(ioutil.WriteFile(global.filename, bytesFile, 0640))
 
-	fmt.Printf("\n\nTemplate Created. '%s'\n", global.filename)
+	echo(fmt.Sprintf("\n\nTemplate Created. '%s'\n", global.filename))
 
 }
