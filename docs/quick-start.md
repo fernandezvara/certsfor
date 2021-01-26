@@ -10,21 +10,20 @@ Easy certificate management tool for development environments for Linux, Windows
 
 Manage multiple CA without hassle. Automate different environments or servers without manual steps or magical flags that can make you lose too much time if some detail is missing.
 
-### Using docker
+#### Using docker
 
 >If you have `docker` installed you can just copy and paste this snippet to follow the guide. This will open an interactive console where operate the command.
->
+
 ```bash
 docker run -v $HOME/.cfd:/home/cfd/.cfd --entrypoint /bin/bash -it ghcr.io/fernandezvara/cfd:latest
 ```
->[!NOTE|label:Quick-Start with docker]
->A directory on the home directory `$HOME/.cfd` is created where the configuration and default database will be stored. This allows persistence while using the container or the binary.
->
->You can customize *this local directory* to meet your needs.
 
-### Using a binary
+>[!NOTE|label:Persistence with docker]
+>A directory will be created on the home directory (`$HOME/.cfd`) where configuration and default database will be stored. If you change to binary, configuration will beheave the same.
 
-Download a binary from the [releases page](https://github.com/fernandezvara/certsfor/releases), for full information go to the [installation guide](./installation).
+#### Using a binary
+
+>Download a binary from the [releases page](https://github.com/fernandezvara/certsfor/releases), for full information go to the [installation guide](./installation).
 
 ## Create your first CA interactively
 
