@@ -1,8 +1,28 @@
 # Quick Start
 
+[![Release](https://img.shields.io/github/release/fernandezvara/certsfor.svg?style=for-the-badge)](https://github.com/fernandezvara/certsfor/releases/latest)
+![GitHub all releases](https://img.shields.io/github/downloads/fernandezvara/certsfor/total?style=for-the-badge)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](/LICENSE)
+[![Build status](https://img.shields.io/github/workflow/status/fernandezvara/certsfor/goreleaser?style=for-the-badge)](https://github.com/fernandezvara/certsfor/actions?workflow=goreleaser)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/fernandezvara/certsfor)
+
 Easy certificate management tool for development environments for Linux, Windows and macOS. While you are a solo developer in your workstation or distributed team of developers with many stations and servers.
 
 Manage multiple CA without hassle. Automate different environments or servers without manual steps or magical flags that can make you lose too much time if some detail is missing.
+
+### Using docker
+
+If you have docker installed you can just copy and paste this snippet to follow the guide. This will open an interactive console where operate the command.
+
+A directory on the home directory `$HOME/cfd` is created where the configuration and default database will be stored. This allows persistence while using the container. Customize the local directory to meet your needs.
+
+```bash
+docker run -v $HOME/cfd:/home/cfd/.cfd -i ghcr.io/fernandezvara/cfd:latest /bin/bash
+```
+
+### Using a binary
+
+Download a binary from the [releases page](https://github.com/fernandezvara/certsfor/releases), for full information go to the [installation guide](./installation).
 
 ## Create your first CA interactively
 
