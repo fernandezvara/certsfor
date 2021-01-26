@@ -7,12 +7,13 @@ Global Flags:
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | :------: |
 | `--config` | Config file location. (Default: `$HOME/.cfg/config.yaml`) | CFD_CONFIG | |
+| `-q`, `--quiet` | Supress the command output (Default: `false`)) | CFD_QUIET | |
 
 ## configfile
 
 By default, the tool comes configured with sane defaults to start working, so there is not configuration file needed. If you are a solo developer probably you won't need to change anything.
 
-Default configuration file is `$HOME/.cfd/config.yaml` and default database will be created on `$HOME/.cfd/db`. You can use other configuration file by using the global flag `--config
+Default configuration file is `$HOME/.cfd/config.yaml` and default database will be created on `$HOME/.cfd/db`. You can use other configuration file by using the global flag `--config`.
 
 ## create ca
 
@@ -55,7 +56,14 @@ Aliases: `create certificate`, `create cert`
 | `-k`, `--key` | Where to store the key file. | | |
 | `-b`, `--bundle` | Bundle file location. Some services like [NGINX](https://www.nginx.org) uses this kind of file. | | |
 | `--ca-cert` | Where to store the CA Certificate. | | |
+| `--pfx` | Where to store the Certificate in pkcs12 format. | | |
+| `--pfx-password` | PFX file password (Default: `changeit`) | | |
 | `-f`, `--file` | File with the answers in YAML format. | | |
+
+>[!NOTE|label:Output to console]
+>Certificate, key, CA certificate, bundle and PFX files can be echoed to console by using `out` or `stdout` as value.
+>
+> Ex: `cdf create cert -f ./template.yaml -c stdout
 
 ## create template
 
@@ -85,6 +93,13 @@ Usage `cfd get [flags]`
 | `-b`, `--bundle` | Bundle file location. | | |
 | `--ca-cert` | Where to store the CA Certificate. | | |
 | `--renew` | Time (expresed as percent) to determine if the certificate must be renewed **(defaults to 20%)**. | | |
+| `--pfx` | Where to store the Certificate in pkcs12 format. | | |
+| `--pfx-password` | PFX file password (Default: `changeit`) | | |
+
+>[!NOTE|label:Output to console]
+>Certificate, key, CA certificate, bundle and PFX files can be echoed to console by using `out` or `stdout` as value.
+>
+> Ex: `cdf get cert --ca-id <uuid> --cn <common-name> -c stdout
 
 ## start api
 

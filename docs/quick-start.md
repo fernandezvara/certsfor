@@ -15,6 +15,10 @@ Manage multiple CA without hassle. Automate different environments or servers wi
 >If you have `docker` installed you can just copy and paste this snippet to follow the guide. This will open an interactive console where operate the command.
 
 ```bash
+# prepare local directory # this will allow file and directory creation
+mkdir -p $HOME/.cfd && chmod 777 $HOME/.cfd
+
+# run a interactive console to try
 docker run -v $HOME/.cfd:/home/cfd/.cfd --entrypoint /bin/bash -it ghcr.io/fernandezvara/cfd:latest
 ```
 
