@@ -54,7 +54,7 @@ func certTemplate() (request client.APICertificateRequest) {
 
 }
 
-func interactiveCertificate(request *client.APICertificateRequest) {
+func interactiveCertificate(request *client.APICertificateRequest, isCertificate bool) {
 
 	var (
 		err     error
@@ -105,6 +105,12 @@ func interactiveCertificate(request *client.APICertificateRequest) {
 
 	request.Key, err = promptSelection("Key Algorithm", items, values, 2)
 	er(err)
+
+	// do no ask for CA
+	if isCertificate {
+		request.Client, err = promptTrueFalseBool("Client Certificate?", "Yes", "No", false)
+		er(err)
+	}
 
 }
 

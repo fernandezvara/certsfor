@@ -80,7 +80,7 @@ func createCaFunc(cmd *cobra.Command, args []string) {
 	} else {
 		// interactive: fill Certificate data
 		request = caTemplate()
-		interactiveCertificate(&request)
+		interactiveCertificate(&request, false)
 	}
 
 	_, id, bytesCert, bytesKey, err = srv.CACreate(ctx, request)

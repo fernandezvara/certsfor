@@ -89,7 +89,7 @@ func createCertificateFunc(cmd *cobra.Command, args []string) {
 	} else {
 		// interactive: fill Certificate data
 		request = certTemplate()
-		interactiveCertificate(&request)
+		interactiveCertificate(&request, true)
 	}
 
 	bytesCA, bytesCert, bytesKey, err = srv.CertificateSet(ctx, collection, request)
