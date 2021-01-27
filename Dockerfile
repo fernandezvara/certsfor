@@ -29,6 +29,9 @@ ENV CFD_TLS_KEY ""
 ENV CFD_TLS_FORCE ""
 ENV CFD_CA_ID ""
 
+# bash prompt
+ENV PS1 "$(whoami):$(pwd)> "
+
 EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/cfd"]
