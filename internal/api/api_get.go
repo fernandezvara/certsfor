@@ -25,8 +25,8 @@ func (a *API) getCertificate(w http.ResponseWriter, r *http.Request, ps httprout
 	if remainingString != "" {
 		remaining, err = strconv.Atoi(remainingString)
 		if err != nil {
-			remaining = 0
-			err = nil
+			rest.BadRequest(w, r, "renew value not allowed")
+			return
 		}
 	}
 

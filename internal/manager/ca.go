@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/fernandezvara/certsfor/pkg/client"
+	"github.com/fernandezvara/rest"
 )
 
 // CA is the root struct that manages the certificate workflows
@@ -35,12 +36,11 @@ func newSerial() *big.Int {
 }
 
 // APITox509Certificate creates a x509.Certificate from the API request
-func APITox509Certificate(request client.APICertificateRequest) (*x509.Certificate, error) {
+func APITox509Certificate(request client.APICertificateRequest) *x509.Certificate {
 
 	var (
 		cert    x509.Certificate
 		subject pkix.Name
-		err     error
 	)
 
 	subject.CommonName = request.DN.CN
@@ -95,7 +95,7 @@ func APITox509Certificate(request client.APICertificateRequest) (*x509.Certifica
 		}
 	}
 
-	return &cert, err
+	return &cert
 
 }
 
@@ -125,6 +125,28 @@ func apiToCryptoKey(request client.APICertificateRequest) (key crypto.PrivateKey
 
 }
 
+// certificate validation
+func valid(request client.APICertificateRequest) (valid bool) {
+
+	// validation - request has the minimal required values
+	if request.DN.CN != "" || request.ExpirationDays > 0 {
+		valid = true
+	}
+
+	var ocurrences int
+	for _, k := range []string{client.RSA2048, client.RSA3072, client.RSA4096, client.ECDSA224, client.ECDSA256, client.ECDSA384, client.ECDSA521} {
+		if k == request.Key {
+			ocurrences++
+		}
+	}
+
+	if ocurrences != 1 {
+		valid = false
+	}
+
+	return
+}
+
 // New creates a new CA struct ready to use
 func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 
@@ -134,10 +156,12 @@ func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 		err           error
 	)
 
-	ca.ca, err = APITox509Certificate(request)
-	if err != nil {
-		return nil, []byte{}, []byte{}, err
+	// validation - request has the minimal required values
+	if !valid(request) {
+		return nil, []byte{}, []byte{}, rest.ErrBadRequest
 	}
+
+	ca.ca = APITox509Certificate(request)
 
 	ca.caKey, err = apiToCryptoKey(request)
 	if err != nil {
@@ -200,10 +224,12 @@ func (c *CA) CreateCertificateFromAPI(request client.APICertificateRequest) ([]b
 		err  error
 	)
 
-	cert, err = APITox509Certificate(request)
-	if err != nil {
-		return []byte{}, []byte{}, err
+	// validation - request has the minimal required values
+	if !valid(request) {
+		return []byte{}, []byte{}, rest.ErrBadRequest
 	}
+
+	cert = APITox509Certificate(request)
 
 	key, err = apiToCryptoKey(request)
 	if err != nil {
