@@ -172,10 +172,7 @@ func (s *Service) certificateGetAsServer(ctx context.Context, collection, id str
 				return
 			}
 
-			newCertificate, err = manager.APITox509Certificate(certificate.Request)
-			if err != nil {
-				return
-			}
+			newCertificate = manager.APITox509Certificate(certificate.Request)
 
 			certificate.Certificate, _, err = ca.CreateCertificate(newCertificate, key)
 			if err != nil {
