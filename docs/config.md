@@ -9,7 +9,7 @@ By default, its stored in `$HOME/.cfd/config.yaml`.
 ```yaml
 api:
   addr: 127.0.0.1:8080
-  enabled: true
+  enabled: false
   log:
     access:
     - stdout
@@ -18,7 +18,7 @@ api:
     - stderr
 ca-id: ""
 db:
-  connection: /home/afv/.cfd/db
+  connection: /home/<username>/.cfd/db
   type: badger
 tls:
   ca: ""
