@@ -74,7 +74,7 @@ Writes an empty certificate creation template as YAML file.
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | :------: |
 | `--ca` | Template is for a CA | | |
-| `-f`, `--file` | Where to store the template file in YAML format. If not provided  | | |
+| `-f`, `--file` | Where to store the template file in YAML format. If not provided it will be requested interactively. | | |
 
 ## get certificate / get cert
 

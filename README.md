@@ -5,6 +5,7 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](/LICENSE)
 [![Build status](https://img.shields.io/github/workflow/status/fernandezvara/certsfor/goreleaser?style=for-the-badge)](https://github.com/fernandezvara/certsfor/actions?workflow=goreleaser)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](https://pkg.go.dev/github.com/fernandezvara/certsfor)
+![Coveralls github](https://img.shields.io/coveralls/github/fernandezvara/certsfor?style=for-the-badge)
 
 Easy certificate management tool for development environments for Linux, Windows and macOS. While you are a solo developer in your workstation or distributed team of developers with many stations and servers.
 
