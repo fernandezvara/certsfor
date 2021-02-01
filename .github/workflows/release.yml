@@ -11,24 +11,12 @@ jobs:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
       -
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
-      -
-        name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.15
       
       -
         name: Docker Login
@@ -48,7 +36,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          
+      
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
       - 
         name: Test
         run: go test ./... -count=1 -coverprofile=profile.cov
@@ -66,7 +60,19 @@ jobs:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
       -
-        name: Run GoReleaser
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
+      -
+        name: Run goreleaser - release
         if: success() && startsWith(github.ref, 'refs/tags/v')
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -76,7 +82,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       -
-        name: Run GoReleaser Snapshot
+        name: Run goreleaser - snapshot
         if: success() && !startsWith(github.ref, 'refs/tags/v')
         uses: goreleaser/goreleaser-action@v2
         with:
