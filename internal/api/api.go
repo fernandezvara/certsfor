@@ -1,10 +1,7 @@
 package api
 
 import (
-	"fmt"
-	"net/http"
 	"os"
-	"os/signal"
 
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/rest"
@@ -14,6 +11,9 @@ import (
 type API struct {
 	srv     *service.Service
 	version string
+	server  *rest.REST
+	logger  *rest.Logging
+	stop    chan os.Signal
 }
 
 // New returns the API struct
@@ -31,8 +31,6 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, ou
 
 	var (
 		routes map[string]map[string]rest.APIEndpoint
-		server *rest.REST
-		logger *rest.Logging
 		err    error
 	)
 
@@ -61,41 +59,37 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, ou
 		},
 	}
 
-	logger, err = rest.NewLogging(outputPaths, errorOutputPaths, debug)
+	a.logger, err = rest.NewLogging(outputPaths, errorOutputPaths, debug)
 	if err != nil {
 		return err
 	}
 
-	server, err = rest.New(apiPort, tlsCertificate, tlsKey, tlsCACert, logger)
+	a.server, err = rest.New(apiPort, tlsCertificate, tlsKey, tlsCACert, a.logger)
 	if err != nil {
 		return err
 	}
 
-	server.SetupRouter(routes)
+	a.server.SetupRouter(routes)
 
 	// graceful
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt)
-	go func() {
-		if err = server.Start(); err != nil {
-			if err != http.ErrServerClosed {
-				fmt.Println("Error on API.Server", err.Error())
-				os.Exit(1)
-			}
-		}
-	}()
+	return a.server.Start()
 
-	<-stop
+}
 
-	logger.Info("api", "initializing server shutdown")
+// Stop the API
+func (a *API) Stop() error {
+
+	var err error
+
+	a.logger.Info("api", "initializing server shutdown")
 
 	// close data service
 	err = a.srv.Close()
 	if err != nil {
-		server.Shutdown() // try to close it anyway
+		a.server.Shutdown() // try to close it anyway
 		return err
 	}
 
-	return server.Shutdown()
+	return a.server.Shutdown()
 
 }
