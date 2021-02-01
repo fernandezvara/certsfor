@@ -26,7 +26,7 @@ func (a *API) postCA(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 
 	response.Request = request
 
-	_, response.CAID, response.Certificate, response.Key, err = a.srv.CACreate(r.Context(), request)
+	response.CAID, response.Certificate, response.Key, err = a.srv.CACreate(r.Context(), request)
 	response.CACertificate = response.Certificate
 	rest.Response(w, response, err, http.StatusCreated, fmt.Sprintf("/v1/ca/%s", response.CAID))
 

@@ -48,7 +48,7 @@ func (s *Service) Close() error {
 }
 
 // CACreate is responsible of create a new CA struct with its certificate returning its information
-func (s *Service) CACreate(ctx context.Context, request client.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
+func (s *Service) CACreate(ctx context.Context, request client.APICertificateRequest) (string, []byte, []byte, error) {
 
 	if s.server {
 		return s.caCreateServer(ctx, request)
@@ -58,7 +58,7 @@ func (s *Service) CACreate(ctx context.Context, request client.APICertificateReq
 
 }
 
-func (s *Service) caCreateClient(ctx context.Context, request client.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
+func (s *Service) caCreateClient(ctx context.Context, request client.APICertificateRequest) (string, []byte, []byte, error) {
 
 	var (
 		certificate client.Certificate
@@ -66,14 +66,13 @@ func (s *Service) caCreateClient(ctx context.Context, request client.APICertific
 	)
 
 	certificate, err = s.client.CACreate(request)
-	return nil, certificate.CAID, certificate.Certificate, certificate.Key, err
+	return certificate.CAID, certificate.Certificate, certificate.Key, err
 
 }
 
-func (s *Service) caCreateServer(ctx context.Context, request client.APICertificateRequest) (*manager.CA, string, []byte, []byte, error) {
+func (s *Service) caCreateServer(ctx context.Context, request client.APICertificateRequest) (string, []byte, []byte, error) {
 
 	var (
-		c           *manager.CA
 		cert        []byte
 		key         []byte
 		id          uuid.UUID
@@ -81,14 +80,14 @@ func (s *Service) caCreateServer(ctx context.Context, request client.APICertific
 		err         error
 	)
 
-	c, cert, key, err = manager.New(request)
+	cert, key, err = manager.New(request)
 	if err != nil {
-		return nil, "", []byte{}, []byte{}, err
+		return "", []byte{}, []byte{}, err
 	}
 
 	id, err = uuid.NewRandom()
 	if err != nil {
-		return nil, "", []byte{}, []byte{}, err
+		return "", []byte{}, []byte{}, err
 	}
 
 	certificate.Certificate = cert
@@ -97,10 +96,10 @@ func (s *Service) caCreateServer(ctx context.Context, request client.APICertific
 
 	err = s.store.Set(ctx, id.String(), "ca", certificate)
 	if err != nil {
-		return nil, "", []byte{}, []byte{}, err
+		return "", []byte{}, []byte{}, err
 	}
 
-	return c, id.String(), cert, key, nil
+	return id.String(), cert, key, nil
 
 }
 
