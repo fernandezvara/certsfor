@@ -21,36 +21,16 @@ func TestNewCA(t *testing.T) {
 	request.DN.OU = "ourganization unit"
 	request.DN.P = "province"
 	request.DN.PC = "postalCode"
-	request.DN.ST = "" // empty, ensure does not adds a address
+	request.DN.ST = "street"
 
 	request.ExpirationDays = 90
 	request.Key = client.RSA4096
 
-	newCA, certFile, keyFile, err := New(request)
+	certFile, keyFile, err := New(request)
 
 	assert.Nil(t, err)
-	assert.NotNil(t, newCA)
 	assert.Greater(t, len(certFile), 0)
 	assert.Greater(t, len(keyFile), 0)
-
-	assert.True(t, newCA.ca.IsCA)
-
-	assert.Equal(t, newCA.ca.Subject.CommonName, request.DN.CN)
-
-	assert.Len(t, newCA.ca.Subject.Country, 1)
-	assert.Len(t, newCA.ca.Subject.Locality, 1)
-	assert.Len(t, newCA.ca.Subject.Organization, 1)
-	assert.Len(t, newCA.ca.Subject.OrganizationalUnit, 1)
-	assert.Len(t, newCA.ca.Subject.Province, 1)
-	assert.Len(t, newCA.ca.Subject.PostalCode, 1)
-	assert.Len(t, newCA.ca.Subject.StreetAddress, 0)
-
-	assert.Equal(t, newCA.ca.Subject.Country[0], request.DN.C)
-	assert.Equal(t, newCA.ca.Subject.Locality[0], request.DN.L)
-	assert.Equal(t, newCA.ca.Subject.Organization[0], request.DN.O)
-	assert.Equal(t, newCA.ca.Subject.OrganizationalUnit[0], request.DN.OU)
-	assert.Equal(t, newCA.ca.Subject.Province[0], request.DN.P)
-	assert.Equal(t, newCA.ca.Subject.PostalCode[0], request.DN.PC)
 
 	newCA2, err := FromBytes(certFile, keyFile)
 	assert.Nil(t, err)
@@ -66,7 +46,7 @@ func TestNewCA(t *testing.T) {
 	assert.Len(t, newCA2.ca.Subject.Country, 1)
 	assert.Len(t, newCA2.ca.Subject.Province, 1)
 	assert.Len(t, newCA2.ca.Subject.Locality, 1)
-	assert.Len(t, newCA2.ca.Subject.StreetAddress, 0)
+	assert.Len(t, newCA2.ca.Subject.StreetAddress, 1)
 	assert.Len(t, newCA2.ca.Subject.PostalCode, 1)
 
 	assert.Equal(t, newCA2.ca.Subject.Organization[0], request.DN.O)
@@ -84,9 +64,8 @@ func TestCertificateWithoutCommonName(t *testing.T) {
 		Key:            client.RSA4096,
 	}
 
-	newCA, certFile, keyFile, err := New(request)
+	certFile, keyFile, err := New(request)
 	assert.Error(t, err, ErrCommonNameBlank)
-	assert.Nil(t, newCA)
 	assert.Len(t, certFile, 0)
 	assert.Len(t, keyFile, 0)
 }
@@ -101,12 +80,10 @@ func TestDifferentKeyTypes(t *testing.T) {
 		request.ExpirationDays = 90
 		request.Key = typ
 
-		newCA, certFile, keyFile, err := New(request)
+		certFile, keyFile, err := New(request)
 
 		fmt.Println(string(certFile))
 		assert.Nil(t, err)
-		assert.NotNil(t, newCA)
-		assert.IsType(t, &CA{}, newCA)
 		assert.Greater(t, len(certFile), 0)
 		assert.Greater(t, len(keyFile), 0)
 
@@ -117,10 +94,9 @@ func TestDifferentKeyTypes(t *testing.T) {
 	request.ExpirationDays = 90
 	request.Key = "invalid"
 
-	newCA, certFile, keyFile, err := New(request)
+	certFile, keyFile, err := New(request)
 
 	assert.Error(t, ErrKeyInvalid, err)
-	assert.Nil(t, newCA)
 	assert.Len(t, certFile, 0)
 	assert.Len(t, keyFile, 0)
 
@@ -139,11 +115,9 @@ func TestSANsAndAPIrequests(t *testing.T) {
 	uri1, uri2 := "https://www.example1.com", "http://isuri.isuri.com"
 	request.SAN = []string{ip1, ip2, dns1, dns2, uri1, uri2}
 
-	newCA, certFile, keyFile, err := New(request)
+	certFile, keyFile, err := New(request)
 
 	assert.Nil(t, err)
-	assert.NotNil(t, newCA)
-	assert.IsType(t, &CA{}, newCA)
 	assert.Greater(t, len(certFile), 0)
 	assert.Greater(t, len(keyFile), 0)
 
@@ -166,9 +140,7 @@ func TestSANsAndAPIrequests(t *testing.T) {
 	assert.Contains(t, otherManager.ca.DNSNames, dns1)
 	assert.Contains(t, otherManager.ca.DNSNames, dns2)
 
-	assert.Equal(t, certFile, newCA.CACertificateBytes())
 	assert.Equal(t, certFile, otherManager.CACertificateBytes())
-	assert.Equal(t, request.DN.CN, newCA.CACertificate().Subject.CommonName)
 	assert.Equal(t, request.DN.CN, otherManager.CACertificate().Subject.CommonName)
 
 	var newRequest client.APICertificateRequest

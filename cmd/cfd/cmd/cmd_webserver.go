@@ -60,33 +60,71 @@ func webserverFunc(cmd *cobra.Command, args []string) {
 
 	var (
 		srv        *service.Service
-		collection string
-		cert       client.Certificate
+		httpServer http.Server
 		err        error
-		ctx        context.Context = context.Background()
 	)
 
 	srv = buildService()
 	defer srv.Close()
+
+	httpServer = buildHTTPServer(srv)
+
+	// graceful
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+	go func() {
+		if err = httpServer.ListenAndServeTLS("", ""); err != nil {
+			if err != http.ErrServerClosed {
+				echo(fmt.Sprintf("Error on WebServer: %s", err.Error()))
+				os.Exit(1)
+			}
+		}
+	}()
+
+	<-stop
+
+	httpServer.Shutdown(context.Background())
+
+}
+
+func buildHTTPServer(srv *service.Service) (httpServer http.Server) {
+
+	var (
+		router     *httprouter.Router
+		collection string
+		ctx        context.Context = context.Background()
+		fullPath   string
+		cert       client.Certificate
+		tlsConfig  tls.Config
+		err        error
+	)
 
 	collection = collectionOrExit()
 
 	cert, err = srv.CertificateGet(ctx, collection, global.cn, global.remaining)
 	er(err)
 
-	// start web server
-	var (
-		httpServer  http.Server
-		router      *httprouter.Router
-		fullPath    string
-		tlsConfig   tls.Config
-		certificate tls.Certificate
-	)
-
 	fullPath = path.Clean(global.root)
 
 	router = httprouter.New()
 	router.ServeFiles("/*filepath", http.Dir(fullPath))
+
+	tlsConfig = buildTLSConfig(cert)
+
+	httpServer.Addr = global.listen
+	httpServer.Handler = router
+	httpServer.TLSConfig = &tlsConfig
+
+	return
+
+}
+
+func buildTLSConfig(cert client.Certificate) (tlsConfig tls.Config) {
+
+	var (
+		certificate tls.Certificate
+		err         error
+	)
 
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(cert.CACertificate)
@@ -110,24 +148,6 @@ func webserverFunc(cmd *cobra.Command, args []string) {
 
 	tlsConfig.Certificates = []tls.Certificate{certificate}
 
-	httpServer.Addr = global.listen
-	httpServer.Handler = router
-	httpServer.TLSConfig = &tlsConfig
-
-	// graceful
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt)
-	go func() {
-		if err = httpServer.ListenAndServeTLS("", ""); err != nil {
-			if err != http.ErrServerClosed {
-				echo(fmt.Sprintf("Error on WebServer: %s", err.Error()))
-				os.Exit(1)
-			}
-		}
-	}()
-
-	<-stop
-
-	httpServer.Shutdown(context.Background())
+	return
 
 }

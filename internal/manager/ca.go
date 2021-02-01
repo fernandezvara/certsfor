@@ -147,8 +147,8 @@ func valid(request client.APICertificateRequest) (valid bool) {
 	return
 }
 
-// New creates a new CA struct ready to use
-func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
+// New creates a new CA certificate/key pair ready to use
+func New(request client.APICertificateRequest) ([]byte, []byte, error) {
 
 	var (
 		ca            CA
@@ -158,14 +158,14 @@ func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 
 	// validation - request has the minimal required values
 	if !valid(request) {
-		return nil, []byte{}, []byte{}, rest.ErrBadRequest
+		return []byte{}, []byte{}, rest.ErrBadRequest
 	}
 
 	ca.ca = APITox509Certificate(request)
 
 	ca.caKey, err = apiToCryptoKey(request)
 	if err != nil {
-		return nil, []byte{}, []byte{}, err
+		return []byte{}, []byte{}, err
 	}
 
 	ca.ca.IsCA = true
@@ -176,7 +176,7 @@ func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 
 	spkiASN1, err := x509.MarshalPKIXPublicKey(ca.caKey.(crypto.Signer).Public())
 	if err != nil {
-		return nil, []byte{}, []byte{}, err
+		return []byte{}, []byte{}, err
 	}
 
 	var spki struct {
@@ -191,12 +191,12 @@ func New(request client.APICertificateRequest) (*CA, []byte, []byte, error) {
 
 	caCert, caKey, err = ca.CreateCertificate(ca.ca, ca.caKey)
 	if err != nil {
-		return nil, []byte{}, []byte{}, err
+		return []byte{}, []byte{}, err
 	}
 
 	ca.bytesCertificate = caCert
 
-	return &ca, caCert, caKey, err
+	return caCert, caKey, err
 
 }
 
