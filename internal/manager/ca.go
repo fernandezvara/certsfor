@@ -184,6 +184,9 @@ func New(request client.APICertificateRequest) ([]byte, []byte, error) {
 		SubjectPublicKey asn1.BitString
 	}
 	_, err = asn1.Unmarshal(spkiASN1, &spki)
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
 
 	skid := sha1.Sum(spki.SubjectPublicKey.Bytes)
 
@@ -280,10 +283,14 @@ func (c *CA) CreateCertificate(request *x509.Certificate, key crypto.PrivateKey)
 
 	certPEM := new(bytes.Buffer)
 
-	pem.Encode(certPEM, &pem.Block{
+	err = pem.Encode(certPEM, &pem.Block{
 		Type:  FileCertificate,
 		Bytes: certBytes,
 	})
+
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
 
 	certPrivKeyPEM := new(bytes.Buffer)
 	certPrivKeyBytes, err := x509.MarshalPKCS8PrivateKey(key)

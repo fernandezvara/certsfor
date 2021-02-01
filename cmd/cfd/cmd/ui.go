@@ -134,7 +134,7 @@ func promptTrueFalseBool(promptLabel, trueString, falseString string, defaultVal
 
 }
 
-// retuns a selector of `items`
+// returns a selector of `items`
 // selectios are 'text to show' string array
 // values are 'text to return'
 //

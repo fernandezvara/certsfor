@@ -53,7 +53,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&global.cfgFile, configFileString, configFileStringDefault, "Configuration file")
-	rootCmd.PersistentFlags().BoolVarP(&global.quiet, configQuiet, configQuietShort, configQuietDefault, "Supress the command output")
+	rootCmd.PersistentFlags().BoolVarP(&global.quiet, configQuiet, configQuietShort, configQuietDefault, "Suppress the command output")
 }
 
 // initConfig reads in config file and ENV variables if set.
