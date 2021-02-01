@@ -2,30 +2,22 @@ package api_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
 	_ "github.com/fernandezvara/certsfor/db/badger" // store driver
-	"github.com/fernandezvara/certsfor/db/store"
-	"github.com/fernandezvara/certsfor/internal/api"
-	"github.com/fernandezvara/certsfor/internal/service"
+	"github.com/fernandezvara/certsfor/internal/tests"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	version   = "test-version"
-	apiIPPort = "127.0.0.1:64000"
-)
-
 var (
 	// all comparations
+	apiIPPort       string
 	caID            string
 	caCertificate   []byte
 	certCertificate []byte
@@ -34,8 +26,11 @@ var (
 
 func TestAPI(t *testing.T) {
 
+	apiIPPort = "127.0.0.1:64000"
+
 	// start API in background
-	go startAPI(t)
+	testAPI := tests.TestAPI{}
+	go testAPI.StartAPI(t, apiIPPort, []byte{}, []byte{}, []byte{})
 
 	// allow api to start
 	time.Sleep(2 * time.Second)
@@ -45,7 +40,8 @@ func TestAPI(t *testing.T) {
 	testCreateCertificate(t) // PUT  /v1/ca/:caid/certificates/:cn
 	testGetCertificate(t)    // GET  /v1/ca/:caid/certificates/:cn
 
-	killAPI(t)
+	err := testAPI.StopAPI(t)
+	assert.Nil(t, err)
 
 }
 
@@ -64,7 +60,7 @@ func testStatus(t *testing.T) {
 	err = getFromBody(res, &response)
 	assert.Nil(t, err)
 
-	assert.Equal(t, version, response.Version)
+	assert.Equal(t, tests.Version, response.Version)
 
 }
 
@@ -243,50 +239,6 @@ func testGetCertificate(t *testing.T) {
 	assert.Equal(t, caCertificate, response.CACertificate)
 	assert.NotEqual(t, certCertificate, response.Certificate)
 	assert.Equal(t, certKey, response.Key)
-
-}
-
-func startAPI(t *testing.T) {
-
-	var (
-		databaseDir string
-		sto         store.Store
-		srv         *service.Service
-		testAPI     *api.API
-		err         error
-	)
-
-	// create temporal directory for the database
-	databaseDir, err = ioutil.TempDir("", "cdf")
-	fmt.Println(databaseDir, err)
-	assert.Nil(t, err)
-	defer cleanup(databaseDir)
-
-	sto, err = store.Open(context.Background(), "badger", databaseDir)
-	assert.Nil(t, err)
-
-	srv = service.NewAsServer(sto, version)
-	testAPI = api.New(srv, version)
-	err = testAPI.Start(apiIPPort, []byte{}, []byte{}, []byte{}, []string{"stdout"}, []string{"stdout"}, true)
-	assert.Nil(t, err)
-
-}
-
-func killAPI(t *testing.T) {
-
-	process, err := os.FindProcess(os.Getegid())
-	assert.Nil(t, err)
-
-	process.Signal(os.Interrupt)
-
-}
-
-func cleanup(databaseDir string) {
-
-	err := os.RemoveAll(databaseDir)
-	if err != nil {
-		panic(err)
-	}
 
 }
 

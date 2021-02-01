@@ -25,6 +25,8 @@ package cmd
 import (
 	"context"
 	"io/ioutil"
+	"os"
+	"os/signal"
 	"regexp"
 
 	"github.com/fernandezvara/certsfor/db/store"
@@ -105,7 +107,16 @@ func apiFunc(cmd *cobra.Command, args []string) {
 	}
 
 	a = api.New(srv, Version)
-	err = a.Start(viper.GetString(configAPIAddr), cert, key, cacert, viper.GetStringSlice(configAPIAccessLog), viper.GetStringSlice(configAPIErrorLog), viper.GetBool(configAPIDebugLog))
+	go a.Start(viper.GetString(configAPIAddr), cert, key, cacert, viper.GetStringSlice(configAPIAccessLog), viper.GetStringSlice(configAPIErrorLog), viper.GetBool(configAPIDebugLog))
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+
+	<-stop
+
+	echo("\nStopping API...\n")
+
+	err = a.Stop()
 	er(err)
 
 }
