@@ -43,6 +43,12 @@ jobs:
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          
       - 
         name: Test
         run: go test ./... -count=1 -coverprofile=profile.cov
