@@ -27,6 +27,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
 
   tests:
+    needs: setup
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
@@ -92,6 +93,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
   cleanup:
+    needs: goreleaser
     runs-on: ubuntu-latest
     steps:
       -
