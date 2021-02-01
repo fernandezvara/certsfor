@@ -83,7 +83,7 @@ func createCaFunc(cmd *cobra.Command, args []string) {
 		interactiveCertificate(&request, false)
 	}
 
-	_, id, bytesCert, bytesKey, err = srv.CACreate(ctx, request)
+	id, bytesCert, bytesKey, err = srv.CACreate(ctx, request)
 
 	er(err)
 

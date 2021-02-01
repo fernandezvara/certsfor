@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/fernandezvara/certsfor/pkg/client"
+	"github.com/fernandezvara/rest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,7 +73,10 @@ func TestCertificateWithoutCommonName(t *testing.T) {
 
 func TestDifferentKeyTypes(t *testing.T) {
 
-	var request client.APICertificateRequest
+	var (
+		request client.APICertificateRequest
+		err     error
+	)
 
 	for _, typ := range []string{client.RSA2048, client.RSA3072, client.RSA4096, client.ECDSA224, client.ECDSA256, client.ECDSA384, client.ECDSA521} {
 
@@ -94,11 +98,11 @@ func TestDifferentKeyTypes(t *testing.T) {
 	request.ExpirationDays = 90
 	request.Key = "invalid"
 
-	certFile, keyFile, err := New(request)
-
+	_, err = apiToCryptoKey(request)
 	assert.Error(t, ErrKeyInvalid, err)
-	assert.Len(t, certFile, 0)
-	assert.Len(t, keyFile, 0)
+
+	_, _, err = New(request)
+	assert.Error(t, rest.ErrBadRequest, err)
 
 }
 
