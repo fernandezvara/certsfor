@@ -1,11 +1,11 @@
-name: goreleaser
+name: ci
 
 on:
   push:
   pull_request:
 
 jobs:
-  goreleaser:
+  setup:
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
@@ -29,7 +29,20 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.15
+      
+      -
+        name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
 
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_CLI_EXPERIMENTAL: "enabled"
+    steps:
       - 
         name: Test
         run: go test ./... -count=1 -coverprofile=profile.cov
@@ -40,14 +53,12 @@ jobs:
         with:
           path-to-profile: profile.cov
 
-      -
-        name: Docker Login
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
-     
+  goreleaser:
+    runs-on: ubuntu-latest
+    needs: tests
+    env:
+      DOCKER_CLI_EXPERIMENTAL: "enabled"
+    steps:
       -
         name: Run GoReleaser
         if: success() && startsWith(github.ref, 'refs/tags/v')
@@ -66,8 +77,11 @@ jobs:
           version: latest
           args: release --rm-dist --snapshot
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
       -
         name: Clear
         if: always()
