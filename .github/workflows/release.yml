@@ -18,7 +18,7 @@ jobs:
 
       - 
         name: Test
-        run: go test ./... -v -count=1 -cover
+        run: go test ./... -count=1 -cover
 
       -
         name: Set up QEMU
