@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -37,7 +38,7 @@ func NewWithConnectionTimeouts(baseURL, caCertPath, certPath, keyPath string, us
 		scheme        string = "http"
 		httpTransport http.Transport
 		certificate   tls.Certificate
-		caCertPool    x509.CertPool
+		caCertPool    *x509.CertPool
 		caCertBytes   []byte
 		tlsConfig     tls.Config
 		err           error
@@ -71,9 +72,9 @@ func NewWithConnectionTimeouts(baseURL, caCertPath, certPath, keyPath string, us
 			if err != nil {
 				return &Client{}, err
 			}
-
+			caCertPool = x509.NewCertPool()
 			caCertPool.AppendCertsFromPEM(caCertBytes)
-			tlsConfig.RootCAs = &caCertPool
+			tlsConfig.RootCAs = caCertPool
 		}
 
 		httpTransport.TLSClientConfig = &tlsConfig
@@ -85,4 +86,14 @@ func NewWithConnectionTimeouts(baseURL, caCertPath, certPath, keyPath string, us
 	}).Set("User-Agent", userAgent).Base(fmt.Sprintf("%s://%s/", scheme, baseURL))
 
 	return &client, nil
+}
+
+func isError(res *http.Response, expected int) error {
+
+	if res.StatusCode != expected {
+		return errors.New(http.StatusText(res.StatusCode))
+	}
+
+	return nil
+
 }
