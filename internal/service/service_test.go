@@ -111,6 +111,7 @@ func TestAPIWithService(t *testing.T) {
 	testCreateCertificate(t, srvClient)
 	testGetCertificates(t, srvClient)
 	testListCertificates(t, srvClient)
+	testDeleteCertificate(t, srvClient)
 
 	err = testAPI.StopAPI(t)
 	assert.Nil(t, err)
@@ -227,5 +228,31 @@ func testListCertificates(t *testing.T, srv *service.Service) {
 	certificates, err = srv.CertificateList(ctx, caID)
 	assert.Nil(t, err)
 	assert.Len(t, certificates, 2)
+
+}
+
+func testDeleteCertificate(t *testing.T, srv *service.Service) {
+
+	var (
+		ctx context.Context = context.Background()
+		ok  bool
+		err error
+	)
+
+	// must fail, ca not found
+	ok, err = srv.CertificateDelete(ctx, "caID not found", "id-not-found")
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
+	assert.False(t, ok)
+
+	// must fail, common name not found
+	ok, err = srv.CertificateDelete(ctx, caID, "id-not-found")
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
+	assert.False(t, ok)
+
+	ok, err = srv.CertificateDelete(ctx, caID, certRequest.DN.CN)
+	assert.Nil(t, err)
+	assert.True(t, ok)
 
 }

@@ -35,11 +35,12 @@ func TestAPI(t *testing.T) {
 	// allow api to start
 	time.Sleep(2 * time.Second)
 
-	testStatus(t)            // GET  /status
-	testCreateCA(t)          // POST /v1/ca
-	testCreateCertificate(t) // PUT  /v1/ca/:caid/certificates/:cn
-	testGetCertificate(t)    // GET  /v1/ca/:caid/certificates/:cn
-	testListCertificates(t)  // GET  /v1/ca/:caid/certificates
+	testStatus(t)            // GET    /status
+	testCreateCA(t)          // POST   /v1/ca
+	testCreateCertificate(t) // PUT    /v1/ca/:caid/certificates/:cn
+	testGetCertificate(t)    // GET    /v1/ca/:caid/certificates/:cn
+	testListCertificates(t)  // GET    /v1/ca/:caid/certificates
+	testDeleteCertificate(t) // DELETE /v1/ca/:caid/certificates/:cn
 
 	err := testAPI.StopAPI(t)
 	assert.Nil(t, err)
@@ -265,6 +266,42 @@ func testListCertificates(t *testing.T) {
 	err = getFromBody(res, &response)
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(response))
+
+}
+
+func testDeleteCertificate(t *testing.T) {
+
+	var (
+		status   int
+		request  client.APICertificateRequest = requestCertificate(true)
+		res      *http.Response
+		response map[string]client.Certificate
+		err      error
+	)
+
+	// 404 - Not found - ca not found
+	status, err = sendData(http.MethodDelete, uri(fmt.Sprintf("/v1/ca/%s/certificates/%s", "ca-non-existent", "id-no-existent")), nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusNotFound, status)
+
+	// 404 - Not found - id not found
+	status, err = sendData(http.MethodDelete, uri(fmt.Sprintf("/v1/ca/%s/certificates/%s", caID, "id-no-existent")), nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusNotFound, status)
+
+	// 204 - No content - delete done
+	status, err = sendData(http.MethodDelete, uri(fmt.Sprintf("/v1/ca/%s/certificates/%s", caID, request.DN.CN)), nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusNoContent, status)
+
+	// 200 - Ok - ensure certificate was deleted
+	res, err = http.Get(uri(fmt.Sprintf("/v1/ca/%s/certificates", caID)))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	err = getFromBody(res, &response)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(response))
 
 }
 

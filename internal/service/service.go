@@ -334,7 +334,7 @@ func (s *Service) CertificateDelete(ctx context.Context, collection, cn string) 
 		return s.store.Delete(ctx, collection, cn)
 	}
 
-	return false, nil // TODO: client
+	return s.client.CertificateDelete(collection, cn)
 
 }
 

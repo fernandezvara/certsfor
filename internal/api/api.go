@@ -61,6 +61,12 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, ou
 				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_]+"},
 			},
 		},
+		"DELETE": {
+			"/v1/ca/:caid/certificates/:cn": {
+				Handler: a.deleteCertificate,
+				Matcher: []string{"", "", "", "", "[a-zA-Z0-9.-_]+"},
+			},
+		},
 	}
 
 	a.logger, err = rest.NewLogging(outputPaths, errorOutputPaths, debug)
