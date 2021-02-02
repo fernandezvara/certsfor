@@ -132,6 +132,10 @@ func (b Badger) GetAll(ctx context.Context, collection string) (values []map[str
 		return nil
 	})
 
+	if values == nil {
+		err = rest.ErrNotFound
+	}
+
 	return
 
 }
@@ -159,8 +163,18 @@ func (b Badger) Set(ctx context.Context, collection, id string, value interface{
 func (b Badger) Delete(ctx context.Context, collection, id string) (ok bool, err error) {
 
 	err = b.db.Update(func(txn *badger.Txn) error {
+
+		_, err = txn.Get(key(collection, id))
+		if err != nil {
+			return err
+		}
+
 		return txn.Delete(key(collection, id))
 	})
+
+	if err == badger.ErrKeyNotFound {
+		err = rest.ErrNotFound
+	}
 
 	if err == nil {
 		ok = true

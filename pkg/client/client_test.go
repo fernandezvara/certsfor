@@ -51,6 +51,8 @@ func TestClientAPI(t *testing.T) {
 	createCA(t, cli)
 	createCertificates(t, cli)
 	getCertificate(t, cli)
+	listCertificates(t, cli)
+	deleteCertificate(t, cli)
 
 	err = testAPI.StopAPI(t)
 	assert.Nil(t, err)
@@ -342,5 +344,66 @@ func getCertificate(t *testing.T, cli *client.Client) {
 	assert.Equal(t, certCertificate.CACertificate, caCertificateBytes)
 	assert.NotEqual(t, certCertificate.Certificate, certCertificateBytes)
 	assert.Equal(t, certCertificate.Key, certKeyBytes)
+
+}
+
+func listCertificates(t *testing.T, cli *client.Client) {
+
+	var (
+		certificates map[string]client.Certificate
+		err          error
+	)
+
+	certificates = make(map[string]client.Certificate)
+
+	// 404 - Not found
+	_, err = cli.CertificateList("ca-not-found")
+	assert.Error(t, err)
+	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
+
+	certificates, err = cli.CertificateList(caID)
+	assert.Nil(t, err)
+	assert.Len(t, certificates, 3)
+
+}
+
+func deleteCertificate(t *testing.T, cli *client.Client) {
+
+	var (
+		certificates map[string]client.Certificate
+
+		ok  bool
+		err error
+	)
+
+	// 404 - Not found
+	ok, err = cli.CertificateDelete(caID, "404")
+	assert.Error(t, err)
+	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
+	assert.False(t, ok)
+
+	// 404 - Not found
+	ok, err = cli.CertificateDelete("1234", "404")
+	assert.Error(t, err)
+	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
+	assert.False(t, ok)
+
+	// 409 - Conflict - CA certificate cannot be deleted
+	ok, err = cli.CertificateDelete(caID, "ca")
+	assert.Error(t, err)
+	assert.Equal(t, http.StatusText(http.StatusConflict), err.Error())
+	assert.False(t, ok)
+
+	// 200 - OK, must match with the certificated created
+	ok, err = cli.CertificateDelete(caID, certRequest.DN.CN)
+	assert.Nil(t, err)
+	assert.True(t, ok)
+
+	// ensure certificate was deleted
+	certificates = make(map[string]client.Certificate)
+
+	certificates, err = cli.CertificateList(caID)
+	assert.Nil(t, err)
+	assert.Len(t, certificates, 2)
 
 }

@@ -329,10 +329,6 @@ func PrivateKeyFromPEM(keyPEM []byte) (key crypto.PrivateKey, err error) {
 	}
 
 	key, err = x509.ParsePKCS8PrivateKey(block.Bytes)
-	if err != nil {
-		err = ErrUnparseableFile
-		return
-	}
 
 	return
 

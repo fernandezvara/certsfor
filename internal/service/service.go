@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto"
 	"crypto/x509"
+	"encoding/base64"
 	"time"
 
 	"github.com/fernandezvara/certsfor/db/store"
@@ -234,8 +235,6 @@ func (s *Service) certificateSetAsClient(ctx context.Context, collection string,
 
 }
 
-// TODO: Make a IsValid for the api request, it must return error if required fields are lost (common name, expirity and key)
-
 func (s *Service) certificateSetAsServer(ctx context.Context, collection string, request client.APICertificateRequest) ([]byte, []byte, []byte, error) {
 
 	var (
@@ -269,21 +268,23 @@ func (s *Service) certificateSetAsServer(ctx context.Context, collection string,
 }
 
 // CertificateList returns an array of certificates and its x509 representation
-func (s *Service) CertificateList(ctx context.Context, collection string) (certificates []client.Certificate, err error) {
+func (s *Service) CertificateList(ctx context.Context, collection string) (certificates map[string]client.Certificate, err error) {
 
 	if s.server {
 		return s.certificateListAsServer(ctx, collection)
 	}
 
-	return // todo
+	return s.client.CertificateList(collection)
 
 }
 
-func (s *Service) certificateListAsServer(ctx context.Context, collection string) (certificates []client.Certificate, err error) {
+func (s *Service) certificateListAsServer(ctx context.Context, collection string) (certificates map[string]client.Certificate, err error) {
 
 	var (
 		mapCertificates []map[string]interface{}
 	)
+
+	certificates = make(map[string]client.Certificate)
 
 	mapCertificates, err = s.store.GetAll(ctx, collection)
 	if err != nil {
@@ -291,7 +292,23 @@ func (s *Service) certificateListAsServer(ctx context.Context, collection string
 	}
 
 	for _, mapCert := range mapCertificates {
+
 		var certificate client.Certificate
+
+		// data encode as base64 string, but needs to be decoded to []byte
+		if val, ok := mapCert["certificate"].(string); ok {
+			mapCert["certificate"], err = base64.StdEncoding.DecodeString(val)
+			if err != nil {
+				return
+			}
+		}
+
+		if val, ok := mapCert["key"].(string); ok {
+			mapCert["key"], err = base64.StdEncoding.DecodeString(val)
+			if err != nil {
+				return
+			}
+		}
 
 		err = mapstructure.Decode(mapCert, &certificate)
 		if err != nil {
@@ -303,7 +320,8 @@ func (s *Service) certificateListAsServer(ctx context.Context, collection string
 			return
 		}
 
-		certificates = append(certificates, certificate)
+		certificates[certificate.X509Certificate.Subject.CommonName] = certificate
+
 	}
 
 	return
@@ -313,10 +331,14 @@ func (s *Service) certificateListAsServer(ctx context.Context, collection string
 func (s *Service) CertificateDelete(ctx context.Context, collection, cn string) (ok bool, err error) {
 
 	if s.server {
+		if cn == "ca" {
+			err = rest.ErrConflict
+			return
+		}
 		return s.store.Delete(ctx, collection, cn)
 	}
 
-	return false, nil // TODO: client
+	return s.client.CertificateDelete(collection, cn)
 
 }
 
