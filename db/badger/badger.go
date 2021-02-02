@@ -132,6 +132,10 @@ func (b Badger) GetAll(ctx context.Context, collection string) (values []map[str
 		return nil
 	})
 
+	if values == nil {
+		err = rest.ErrNotFound
+	}
+
 	return
 
 }

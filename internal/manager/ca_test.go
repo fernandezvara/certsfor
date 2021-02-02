@@ -1,7 +1,6 @@
 package manager
 
 import (
-	"fmt"
 	"net"
 	"net/url"
 	"testing"
@@ -85,8 +84,6 @@ func TestDifferentKeyTypes(t *testing.T) {
 		request.Key = typ
 
 		certFile, keyFile, err := New(request)
-
-		fmt.Println(string(certFile))
 		assert.Nil(t, err)
 		assert.Greater(t, len(certFile), 0)
 		assert.Greater(t, len(keyFile), 0)

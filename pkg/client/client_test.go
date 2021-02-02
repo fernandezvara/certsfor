@@ -51,6 +51,7 @@ func TestClientAPI(t *testing.T) {
 	createCA(t, cli)
 	createCertificates(t, cli)
 	getCertificate(t, cli)
+	listCertificates(t, cli)
 
 	err = testAPI.StopAPI(t)
 	assert.Nil(t, err)
@@ -342,5 +343,25 @@ func getCertificate(t *testing.T, cli *client.Client) {
 	assert.Equal(t, certCertificate.CACertificate, caCertificateBytes)
 	assert.NotEqual(t, certCertificate.Certificate, certCertificateBytes)
 	assert.Equal(t, certCertificate.Key, certKeyBytes)
+
+}
+
+func listCertificates(t *testing.T, cli *client.Client) {
+
+	var (
+		certificates map[string]client.Certificate
+		err          error
+	)
+
+	certificates = make(map[string]client.Certificate)
+
+	// 404 - Not found
+	_, err = cli.CertificateList("ca-not-found")
+	assert.Error(t, err)
+	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
+
+	certificates, err = cli.CertificateList(caID)
+	assert.Nil(t, err)
+	assert.Len(t, certificates, 3)
 
 }

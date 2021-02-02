@@ -39,6 +39,7 @@ func TestAPI(t *testing.T) {
 	testCreateCA(t)          // POST /v1/ca
 	testCreateCertificate(t) // PUT  /v1/ca/:caid/certificates/:cn
 	testGetCertificate(t)    // GET  /v1/ca/:caid/certificates/:cn
+	testListCertificates(t)  // GET  /v1/ca/:caid/certificates
 
 	err := testAPI.StopAPI(t)
 	assert.Nil(t, err)
@@ -239,6 +240,31 @@ func testGetCertificate(t *testing.T) {
 	assert.Equal(t, caCertificate, response.CACertificate)
 	assert.NotEqual(t, certCertificate, response.Certificate)
 	assert.Equal(t, certKey, response.Key)
+
+}
+
+func testListCertificates(t *testing.T) {
+
+	var (
+		response map[string]client.Certificate
+		res      *http.Response
+		err      error
+		certURI  string = uri(fmt.Sprintf("/v1/ca/%s/certificates", caID))
+	)
+
+	// 404 - Not found
+	res, err = http.Get(uri(fmt.Sprintf("/v1/ca/%s/certificates", "ca-non-existent")))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+
+	// 200 - OK
+	res, err = http.Get(certURI)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	err = getFromBody(res, &response)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(response))
 
 }
 

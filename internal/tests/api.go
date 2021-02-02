@@ -45,6 +45,14 @@ func (ta *TestAPI) StartAPI(t *testing.T, apiIPPort string, cert, key, caCert []
 
 }
 
+// StartAPIWithService is exported to be useful on other libraries tests. Starts the api in testing mode
+func (ta *TestAPI) StartAPIWithService(t *testing.T, apiIPPort string, cert, key, caCert []byte, srv *service.Service) {
+
+	ta.api = api.New(srv, Version)
+	go ta.api.Start(apiIPPort, cert, key, caCert, []string{"stdout"}, []string{"stdout"}, true)
+
+}
+
 // StopAPI stops the API for testing
 func (ta *TestAPI) StopAPI(t *testing.T) (err error) {
 
