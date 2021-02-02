@@ -331,6 +331,10 @@ func (s *Service) certificateListAsServer(ctx context.Context, collection string
 func (s *Service) CertificateDelete(ctx context.Context, collection, cn string) (ok bool, err error) {
 
 	if s.server {
+		if cn == "ca" {
+			err = rest.ErrConflict
+			return
+		}
 		return s.store.Delete(ctx, collection, cn)
 	}
 

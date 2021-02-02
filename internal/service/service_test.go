@@ -251,6 +251,12 @@ func testDeleteCertificate(t *testing.T, srv *service.Service) {
 	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
 	assert.False(t, ok)
 
+	// must fail, ca certificate cannot be deleted
+	ok, err = srv.CertificateDelete(ctx, caID, "ca")
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusText(http.StatusConflict), err.Error())
+	assert.False(t, ok)
+
 	ok, err = srv.CertificateDelete(ctx, caID, certRequest.DN.CN)
 	assert.Nil(t, err)
 	assert.True(t, ok)

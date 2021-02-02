@@ -399,11 +399,6 @@ func deleteCertificate(t *testing.T, cli *client.Client) {
 	assert.Nil(t, err)
 	assert.True(t, ok)
 
-	// 200 - OK, must match with the certificated created, but renewed
-	ok, err = cli.CertificateDelete(caID, certRequest.DN.CN)
-	assert.Nil(t, err)
-	assert.True(t, ok)
-
 	// ensure certificate was deleted
 	certificates = make(map[string]client.Certificate)
 
