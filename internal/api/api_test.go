@@ -33,7 +33,7 @@ func TestAPI(t *testing.T) {
 	go testAPI.StartAPI(t, apiIPPort, []byte{}, []byte{}, []byte{}, false)
 
 	// allow api to start
-	time.Sleep(2 * time.Second)
+	time.Sleep(4 * time.Second)
 
 	testStatus(t)            // GET    /status
 	testCreateCA(t)          // POST   /v1/ca
