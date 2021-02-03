@@ -45,6 +45,7 @@ type globalConfig struct {
 	collection  string // ca id <-> colelction
 	cn          string // common name as argument
 	bool1       bool   // common bool option
+	bool2       bool   // common bool option
 	remaining   int    // remaining percert (integer) for expiration
 	listen      string // webserver ip:port to listen
 	root        string // webserver root
