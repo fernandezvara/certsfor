@@ -40,9 +40,9 @@ func TestClientAPI(t *testing.T) {
 		err     error
 	)
 
-	testAPI.StartAPI(t, localIPPort, []byte{}, []byte{}, []byte{}) // start HTTP api
+	testAPI.StartAPI(t, localIPPort, []byte{}, []byte{}, []byte{}, false) // start HTTP api
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	cli = createClient(t)
 	assert.NotNil(t, cli)
@@ -91,9 +91,9 @@ func testHTTPSClientAPI(t *testing.T) {
 	assert.Nil(t, err)
 
 	// https api
-	testAPI.StartAPI(t, localIPPortSSL, certCertificateBytes, certKeyBytes, caCertificateBytes)
+	testAPI.StartAPI(t, localIPPortSSL, certCertificateBytes, certKeyBytes, caCertificateBytes, true)
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	cliSSL, err = client.NewWithConnectionTimeouts(localIPPortSSL, caCertFile, certFile, keyFile, false, 100*time.Millisecond, 100*time.Millisecond, 500*time.Millisecond)
 	assert.Nil(t, err)
@@ -132,6 +132,9 @@ func TestClientWithErrors(t *testing.T) {
 	assert.Error(t, err)
 
 	_, err = cliWithErrors.CertificateGet("ca-uuid", "common-name", 20)
+	assert.Error(t, err)
+
+	_, err = cliWithErrors.CertificateDelete("ca-uuid", "common-name")
 	assert.Error(t, err)
 
 	// client with non existent certificates or keys

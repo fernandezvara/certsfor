@@ -107,7 +107,7 @@ func apiFunc(cmd *cobra.Command, args []string) {
 	}
 
 	a = api.New(srv, Version)
-	go a.Start(viper.GetString(configAPIAddr), cert, key, cacert, viper.GetStringSlice(configAPIAccessLog), viper.GetStringSlice(configAPIErrorLog), viper.GetBool(configAPIDebugLog))
+	go a.Start(viper.GetString(configAPIAddr), cert, key, cacert, viper.GetBool(configTLSRequireClientCertificate), viper.GetStringSlice(configAPIAccessLog), viper.GetStringSlice(configAPIErrorLog), viper.GetBool(configAPIDebugLog))
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)

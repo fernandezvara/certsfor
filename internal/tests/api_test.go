@@ -18,9 +18,9 @@ func TestAPIForTesting(t *testing.T) {
 
 	testAPI := TestAPI{}
 
-	testAPI.StartAPI(t, localIPPort, []byte{}, []byte{}, []byte{})
+	testAPI.StartAPI(t, localIPPort, []byte{}, []byte{}, []byte{}, false)
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	err := testAPI.StopAPI(t)
 	assert.Nil(t, err)
@@ -49,9 +49,9 @@ func TestAPIWithService(t *testing.T) {
 
 	testAPI := TestAPI{}
 
-	testAPI.StartAPIWithService(t, localIPPort, []byte{}, []byte{}, []byte{}, srv)
+	testAPI.StartAPIWithService(t, localIPPort, []byte{}, []byte{}, []byte{}, false, srv)
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	err = testAPI.StopAPI(t)
 	assert.Nil(t, err)

@@ -13,8 +13,7 @@ func (c *Client) CertificateDelete(caID, cn string) (ok bool, err error) {
 		res *http.Response
 	)
 
-	res, err = c.http.Delete(uri).ReceiveSuccess(nil)
-	if err != nil {
+	if res, err = c.http.Delete(uri).ReceiveSuccess(nil); err != nil {
 		return
 	}
 

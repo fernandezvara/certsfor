@@ -27,7 +27,7 @@ func New(srv *service.Service, version string) *API {
 }
 
 // Start the API
-func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, outputPaths, errorOutputPaths []string, debug bool) error {
+func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, requireClientCertificate bool, outputPaths, errorOutputPaths []string, debug bool) error {
 
 	var (
 		routes map[string]map[string]rest.APIEndpoint
@@ -74,7 +74,7 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, ou
 		return err
 	}
 
-	a.server, err = rest.New(apiPort, tlsCertificate, tlsKey, tlsCACert, a.logger)
+	a.server, err = rest.New(apiPort, tlsCertificate, tlsKey, tlsCACert, requireClientCertificate, a.logger)
 	if err != nil {
 		return err
 	}
