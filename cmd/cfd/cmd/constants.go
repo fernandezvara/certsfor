@@ -122,18 +122,21 @@ var (
 	// configWebEnabledDefault     = false
 
 	// tls
-	configTLSCA                 = "tls.ca"
-	configTLSCAEnv              = "CFD_TLS_CA"
-	configTLSCADefault          = ""
-	configTLSCertificate        = "tls.certificate"
-	configTLSCertificateEnv     = "CFD_TLS_CERT"
-	configTLSCertificateDefault = ""
-	configTLSKey                = "tls.key"
-	configTLSKeyEnv             = "CFD_TLS_KEY"
-	configTLSKeyDefault         = ""
-	configTLSUseForce           = "tls.force"
-	configTLSUseForceEnv        = "CFD_TLS_FORCE"
-	configTLSUseForceDefault    = false
+	configTLSCA                              = "tls.ca"
+	configTLSCAEnv                           = "CFD_TLS_CA"
+	configTLSCADefault                       = ""
+	configTLSCertificate                     = "tls.certificate"
+	configTLSCertificateEnv                  = "CFD_TLS_CERT"
+	configTLSCertificateDefault              = ""
+	configTLSKey                             = "tls.key"
+	configTLSKeyEnv                          = "CFD_TLS_KEY"
+	configTLSKeyDefault                      = ""
+	configTLSRequireClientCertificate        = "tls.require_client_certificate"
+	configTLSRequireClientCertificateEnv     = "CFD_TLS_CLIENT_CERT"
+	configTLSRequireClientCertificateDefault = false
+	configTLSUseForce                        = "tls.force"
+	configTLSUseForceEnv                     = "CFD_TLS_FORCE"
+	configTLSUseForceDefault                 = false
 
 	// ca id
 	configCAID        = "ca-id"

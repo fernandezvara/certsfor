@@ -89,6 +89,8 @@ func initConfig() {
 	viper.BindEnv(configTLSCertificate, configTLSCertificateEnv)
 	viper.SetDefault(configTLSKey, configTLSKeyDefault)
 	viper.BindEnv(configTLSKey, configTLSKeyEnv)
+	viper.SetDefault(configTLSRequireClientCertificate, configTLSRequireClientCertificateDefault)
+	viper.BindEnv(configTLSRequireClientCertificate, configTLSRequireClientCertificateEnv)
 	viper.SetDefault(configTLSUseForce, configTLSUseForceDefault)
 	viper.BindEnv(configTLSUseForce, configTLSUseForceEnv)
 
