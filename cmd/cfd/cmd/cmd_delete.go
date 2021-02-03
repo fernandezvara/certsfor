@@ -26,13 +26,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// createCmd holds all `create` commands
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create commands.",
-	Long:  `Create commands.`,
+// deleteCmd is the main command for administration
+var deleteCmd = &cobra.Command{
+	Use:     "delete",
+	Aliases: []string{"remove"},
+	Short:   "Delete commands.",
+	Long:    `Delete commands.`,
 }
 
 func init() {
-	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(deleteCmd)
 }
