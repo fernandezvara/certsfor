@@ -25,6 +25,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -123,8 +124,9 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		echo(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
+	if err := viper.ReadInConfig(); err != nil {
+		er(err)
+		// echo(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
 	}
 }
 
@@ -142,7 +144,7 @@ func isOutput() bool {
 
 func er(err error) {
 	if err != nil {
-		fmt.Printf("err: %T \n%s\n", err, err.Error())
+		echo(fmt.Sprintf("\nAn error has been found:\n%s\n", strings.Title(err.Error())))
 		os.Exit(1)
 	}
 }

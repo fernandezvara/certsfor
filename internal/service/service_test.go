@@ -84,6 +84,7 @@ func TestAPIWithService(t *testing.T) {
 	assert.Nil(t, err)
 
 	srv = service.NewAsServer(sto, tests.Version)
+	assert.True(t, srv.Server())
 
 	// must fail, ca not found
 	_, err = srv.CAGet("caID-not-found")
@@ -105,7 +106,7 @@ func TestAPIWithService(t *testing.T) {
 	assert.Nil(t, err)
 
 	srvClient = service.NewAsClient(cli, tests.Version)
-
+	assert.False(t, srvClient.Server())
 	testStatus(t, srvClient)
 	testCreateCA(t, srvClient)
 	testCreateCertificate(t, srvClient)
@@ -115,6 +116,10 @@ func TestAPIWithService(t *testing.T) {
 
 	err = testAPI.StopAPI(t)
 	assert.Nil(t, err)
+
+	// service without store
+	srvUseless := service.NewAsServer(nil, tests.Version)
+	assert.Nil(t, srvUseless.Close())
 
 }
 

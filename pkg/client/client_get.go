@@ -22,7 +22,7 @@ func (c *Client) CertificateGet(caID, cn string, remaining int) (response Certif
 		return
 	}
 
-	err = isError(res, http.StatusOK)
+	err = isError(res, err, http.StatusOK)
 
 	return
 

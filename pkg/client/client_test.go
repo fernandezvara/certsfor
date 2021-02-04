@@ -93,7 +93,7 @@ func testHTTPSClientAPI(t *testing.T) {
 	// https api
 	testAPI.StartAPI(t, localIPPortSSL, certCertificateBytes, certKeyBytes, caCertificateBytes, true)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	cliSSL, err = client.NewWithConnectionTimeouts(localIPPortSSL, caCertFile, certFile, keyFile, false, 100*time.Millisecond, 100*time.Millisecond, 500*time.Millisecond)
 	assert.Nil(t, err)

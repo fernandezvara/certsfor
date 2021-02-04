@@ -1,13 +1,14 @@
 package client
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func testIsError(t *testing.T) {
+func TestIsError(t *testing.T) {
 
 	var (
 		res *http.Response
@@ -18,11 +19,14 @@ func testIsError(t *testing.T) {
 		StatusCode: 400,
 	}
 
-	err = isError(res, http.StatusOK)
+	err = isError(res, err, http.StatusOK)
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), http.StatusText(http.StatusBadRequest))
 
-	err = isError(res, http.StatusOK)
+	res = &http.Response{
+		StatusCode: 200,
+	}
+	err = isError(res, err, http.StatusOK)
 	assert.Nil(t, err)
 
 	// error on *http.Response
@@ -30,14 +34,17 @@ func testIsError(t *testing.T) {
 		StatusCode: 400,
 	}
 
-	err = isError(res, http.StatusOK)
+	err = isError(res, err, http.StatusOK)
 	assert.Equal(t, err.Error(), http.StatusText(http.StatusBadRequest))
 
 	res = &http.Response{
 		StatusCode: 200,
 	}
 
-	err = isError(res, http.StatusOK)
+	err = isError(res, err, http.StatusOK)
 	assert.Nil(t, err)
+
+	err = isError(nil, errors.New("unknown"), http.StatusOK)
+	assert.ErrorIs(t, err, ErrUnknownError)
 
 }

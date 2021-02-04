@@ -16,7 +16,7 @@ func (c *Client) CACreate(request APICertificateRequest) (response Certificate, 
 		return
 	}
 
-	err = isError(res, http.StatusCreated)
+	err = isError(res, err, http.StatusCreated)
 
 	return
 

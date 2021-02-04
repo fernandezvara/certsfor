@@ -14,8 +14,7 @@ func (c *Client) CertificateList(caID string) (response map[string]Certificate, 
 	)
 
 	res, err = c.http.Get(uri).ReceiveSuccess(&response)
-
-	err = isError(res, http.StatusOK)
+	err = isError(res, err, http.StatusOK)
 
 	return
 
