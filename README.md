@@ -1,4 +1,4 @@
-# certsfor.dev (cdf)
+# certsfor.dev (cfd)
 
 [![Release](https://img.shields.io/github/release/fernandezvara/certsfor.svg?style=for-the-badge)](https://github.com/fernandezvara/certsfor/releases/latest)
 [![GitHub all releases](https://img.shields.io/github/downloads/fernandezvara/certsfor/total?style=for-the-badge)](https://github.com/fernandezvara/certsfor/releases/latest)
