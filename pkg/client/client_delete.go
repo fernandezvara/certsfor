@@ -17,7 +17,7 @@ func (c *Client) CertificateDelete(caID, cn string) (ok bool, err error) {
 		return
 	}
 
-	err = isError(res, http.StatusNoContent)
+	err = isError(res, err, http.StatusNoContent)
 	if err == nil {
 		ok = true
 	}

@@ -12,11 +12,7 @@ func (c *Client) Status() (status APIStatus, err error) {
 	)
 
 	res, err = c.http.Get("/status").ReceiveSuccess(&status)
-	if err != nil {
-		return
-	}
-
-	err = isError(res, http.StatusOK)
+	err = isError(res, err, http.StatusOK)
 
 	return
 

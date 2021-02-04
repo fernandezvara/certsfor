@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/dghubble/sling"
@@ -88,7 +89,19 @@ func NewWithConnectionTimeouts(baseURL, caCertPath, certPath, keyPath string, us
 	return &client, nil
 }
 
-func isError(res *http.Response, expected int) error {
+func isError(res *http.Response, err error, expected int) error {
+
+	// no response because an error, return it
+	if res == nil {
+
+		switch err.(type) {
+		case *url.Error:
+			return ErrConnectionRefused
+		default:
+			return ErrUnknownError
+		}
+
+	}
 
 	if res.StatusCode != expected {
 		return errors.New(http.StatusText(res.StatusCode))

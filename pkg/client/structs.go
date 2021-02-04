@@ -1,9 +1,18 @@
 package client
 
-import "crypto/x509"
+import (
+	"crypto/x509"
+	"errors"
+)
 
 const (
 	userAgent = "client.certsfor.dev"
+)
+
+// errors
+var (
+	ErrUnknownError      = errors.New("unknown error connecting to server")
+	ErrConnectionRefused = errors.New("connection refused")
 )
 
 // Certificate holds the certificate and key file used to interact with the

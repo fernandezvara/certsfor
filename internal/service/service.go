@@ -40,6 +40,11 @@ func NewAsClient(client *client.Client, version string) *Service {
 	}
 }
 
+// Server returns true when the library is used as server,
+func (s *Service) Server() bool {
+	return s.server
+}
+
 // Close the store service in a proper way
 func (s *Service) Close() error {
 	if s.store != nil { // is used?

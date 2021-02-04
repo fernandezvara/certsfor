@@ -32,6 +32,7 @@ import (
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/spf13/cobra"
 )
 
@@ -78,6 +79,7 @@ func listCertificateFunc(cmd *cobra.Command, args []string) {
 
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
+	t.Style().Format.Header = text.FormatTitle
 	t.AppendHeader(table.Row{"Common Name", "Distinguished Name", "Expires in"})
 
 	// sort by cn
