@@ -51,11 +51,11 @@ Aliases: `create certificate`, `create cert`
 
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | :------: |
+| `-b`, `--bundle` | Bundle file location. Some services like [NGINX](https://www.nginx.org) uses this kind of file. | | |
+| `--ca-cert` | Where to store the CA Certificate. | | |
 | `--ca-id` | ID of the CA to interact to. | CFD_CA_ID | :heavy_check_mark: |
 | `-c`, `--cert` | Where to store the Certificate after its creation. | | |
 | `-k`, `--key` | Where to store the key file. | | |
-| `-b`, `--bundle` | Bundle file location. Some services like [NGINX](https://www.nginx.org) uses this kind of file. | | |
-| `--ca-cert` | Where to store the CA Certificate. | | |
 | `--pfx` | Where to store the Certificate in pkcs12 format. | | |
 | `--pfx-password` | PFX file password (Default: `changeit`) | | |
 | `-f`, `--file` | File with the answers in YAML format. | | |
@@ -100,6 +100,34 @@ By default, when a certificate is retrieved using the cli, it will ask the CA to
 >Certificate, key, CA certificate, bundle and PFX files can be echoed to console by using `out` or `stdout` as value.
 >
 > Ex: `cdf get cert --ca-id <uuid> --cn <common-name> -c stdout`
+
+## list certificate / list certificates / list cert
+
+Return a list with all the certificates on the CA.
+
+**Usage:** `cfd list certificate [flags]`
+
+| Flag | Explanation | Environment Var | Required |
+| ---- | ----------- | --------------- | :------: |
+| `--ca-id` | ID of the CA to interact to. | CFD_CA_ID | :heavy_check_mark: |
+| `--csv` | Output as CSV. | |  |
+| `--md` | Output as Markdown. | | |
+
+```bash
+>
+> # example
+> cdf get list cert
+┌─────────────┬──────────────────────────────────────┬─────────────────────────────┐
+│ Common Name │ Distinguished Name                   │ Expires In                  │
+├─────────────┼──────────────────────────────────────┼─────────────────────────────┤
+│ cert3       │ CN=cert3,OU=dev,O=CFD,ST=Madrid,C=ES │ 86 days (04/05/2021 00:08)  │
+│ ca          │ CN=ca                                │ 361 days (02/02/2022 22:55) │
+│ cert1       │ CN=cert1                             │ 86 days (04/05/2021 00:06)  │
+│ cert2       │ CN=cert2                             │ 86 days (04/05/2021 00:07)  │
+└─────────────┴──────────────────────────────────────┴─────────────────────────────┘
+
+
+```
 
 ## start api
 
