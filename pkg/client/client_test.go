@@ -40,7 +40,7 @@ func TestClientAPI(t *testing.T) {
 		err     error
 	)
 
-	testAPI.StartAPI(t, localIPPort, []byte{}, []byte{}, []byte{}, false) // start HTTP api
+	testAPI.StartAPI(t, localIPPort, "", "", "", 0, false) // start HTTP api
 
 	time.Sleep(1 * time.Second)
 
@@ -67,6 +67,8 @@ func testHTTPSClientAPI(t *testing.T) {
 		certificatesDir string
 		certFile        string
 		keyFile         string
+		clientCertFile  string
+		clientKeyFile   string
 		caCertFile      string
 		cliSSL          *client.Client
 		status          client.APIStatus
@@ -78,12 +80,20 @@ func testHTTPSClientAPI(t *testing.T) {
 	certificatesDir, err = ioutil.TempDir("", "certs")
 	assert.Nil(t, err)
 
-	certFile = fmt.Sprintf("%s/%s", certificatesDir, "cert.crt")
-	err = ioutil.WriteFile(certFile, clientCertificateBytes, 0660)
+	certFile = fmt.Sprintf("%s/%s", certificatesDir, "api-cert.crt")
+	err = ioutil.WriteFile(certFile, certCertificateBytes, 0660)
 	assert.Nil(t, err)
 
-	keyFile = fmt.Sprintf("%s/%s", certificatesDir, "key.crt")
-	err = ioutil.WriteFile(keyFile, clientKeyBytes, 0660)
+	keyFile = fmt.Sprintf("%s/%s", certificatesDir, "api-key.crt")
+	err = ioutil.WriteFile(keyFile, certKeyBytes, 0660)
+	assert.Nil(t, err)
+
+	clientCertFile = fmt.Sprintf("%s/%s", certificatesDir, "client-cert.crt")
+	err = ioutil.WriteFile(clientCertFile, clientCertificateBytes, 0660)
+	assert.Nil(t, err)
+
+	clientKeyFile = fmt.Sprintf("%s/%s", certificatesDir, "client-key.crt")
+	err = ioutil.WriteFile(clientKeyFile, clientKeyBytes, 0660)
 	assert.Nil(t, err)
 
 	caCertFile = fmt.Sprintf("%s/%s", certificatesDir, "cacert.crt")
@@ -91,11 +101,11 @@ func testHTTPSClientAPI(t *testing.T) {
 	assert.Nil(t, err)
 
 	// https api
-	testAPI.StartAPI(t, localIPPortSSL, certCertificateBytes, certKeyBytes, caCertificateBytes, true)
+	testAPI.StartAPI(t, localIPPortSSL, certFile, keyFile, caCertFile, 0, true)
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 
-	cliSSL, err = client.NewWithConnectionTimeouts(localIPPortSSL, caCertFile, certFile, keyFile, false, 100*time.Millisecond, 100*time.Millisecond, 500*time.Millisecond)
+	cliSSL, err = client.NewWithConnectionTimeouts(localIPPortSSL, caCertFile, clientCertFile, clientKeyFile, false, 100*time.Millisecond, 100*time.Millisecond, 500*time.Millisecond)
 	assert.Nil(t, err)
 
 	status, err = cliSSL.Status()

@@ -30,7 +30,7 @@ func TestAPI(t *testing.T) {
 
 	// start API in background
 	testAPI := tests.TestAPI{}
-	go testAPI.StartAPI(t, apiIPPort, []byte{}, []byte{}, []byte{}, false)
+	go testAPI.StartAPI(t, apiIPPort, "", "", "", 0, false)
 
 	// allow api to start
 	time.Sleep(2 * time.Second)

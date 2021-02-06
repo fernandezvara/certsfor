@@ -1,10 +1,16 @@
 package api
 
 import (
+	"context"
+	"io/ioutil"
 	"os"
+	"regexp"
 
+	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/service"
+	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/fernandezvara/rest"
+	"github.com/fernandezvara/scheduler"
 )
 
 // API is the struct that manages the api
@@ -27,11 +33,13 @@ func New(srv *service.Service, version string) *API {
 }
 
 // Start the API
-func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, requireClientCertificate bool, outputPaths, errorOutputPaths []string, debug bool) error {
+func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCaCert string, remaining int, requireClientCertificate bool, outputPaths, errorOutputPaths []string, debug bool) error {
 
 	var (
-		routes map[string]map[string]rest.APIEndpoint
-		err    error
+		routes            map[string]map[string]rest.APIEndpoint
+		cert, key, cacert []byte
+		startScheduler    bool
+		err               error
 	)
 
 	routes = map[string]map[string]rest.APIEndpoint{
@@ -74,15 +82,32 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCACert []byte, re
 		return err
 	}
 
-	a.server, err = rest.New(apiPort, tlsCertificate, tlsKey, tlsCACert, requireClientCertificate, a.logger)
+	// load certificate
+	cert, key, cacert, startScheduler, err = getCertificates(tlsCertificate, tlsKey, tlsCaCert, remaining, a.srv)
+
+	a.server, err = rest.New(apiPort, cert, key, cacert, requireClientCertificate, a.logger)
 	if err != nil {
 		return err
+	}
+
+	if startScheduler {
+
+		// look if an certificate update must be done daily
+		fn := func() {
+			cert, key, _, _, err = getCertificates(tlsCertificate, tlsKey, tlsCaCert, remaining, a.srv)
+			a.server.SetCertificate(cert, key)
+		}
+
+		scheduler.Every(1).Minutes().NotImmediately().Run(fn)
+
 	}
 
 	a.server.SetupRouter(routes)
 
 	// graceful
-	return a.server.Start()
+	err = a.server.Start()
+
+	return err
 
 }
 
@@ -101,5 +126,64 @@ func (a *API) Stop() error {
 	}
 
 	return a.server.Shutdown()
+
+}
+
+func getCertificates(tlsCertificate, tlsKey, tlsCaCert string, remaining int, srv *service.Service) (cert, key, cacert []byte, startScheduler bool, err error) {
+
+	if isUUID(tlsCaCert) {
+		// get cert from DB
+		var (
+			ca  *manager.CA
+			crt client.Certificate
+		)
+
+		if ca, err = srv.CAGet(tlsCaCert); err != nil {
+			return
+		}
+
+		if crt, err = srv.CertificateGet(context.Background(), tlsCaCert, tlsCertificate, remaining); err != nil {
+			return
+		}
+
+		cacert = ca.CACertificateBytes()
+		cert = crt.Certificate
+		key = crt.Key
+		startScheduler = true
+
+	} else {
+		// ca certificate is a file?
+		if cacert, err = fileBytes(tlsCaCert); err != nil {
+			return
+		}
+
+		if cert, err = fileBytes(tlsCertificate); err != nil {
+			return
+		}
+
+		if key, err = fileBytes(tlsKey); err != nil {
+			return
+		}
+
+	}
+
+	return
+
+}
+
+func fileBytes(filename string) ([]byte, error) {
+
+	if filename == "" {
+		return []byte{}, nil
+	}
+
+	return ioutil.ReadFile(filename)
+
+}
+
+// cfae8b38-57dd-4322-a83f-bc5730689198
+func isUUID(uuid string) bool {
+
+	return regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$").MatchString(uuid)
 
 }

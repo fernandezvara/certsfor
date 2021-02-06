@@ -18,7 +18,7 @@ func TestAPIForTesting(t *testing.T) {
 
 	testAPI := TestAPI{}
 
-	testAPI.StartAPI(t, localIPPort, []byte{}, []byte{}, []byte{}, false)
+	testAPI.StartAPI(t, localIPPort, "", "", "", 0, false)
 
 	time.Sleep(1 * time.Second)
 
@@ -49,7 +49,7 @@ func TestAPIWithService(t *testing.T) {
 
 	testAPI := TestAPI{}
 
-	testAPI.StartAPIWithService(t, localIPPort, []byte{}, []byte{}, []byte{}, false, srv)
+	testAPI.StartAPIWithService(t, localIPPort, "", "", "", 0, false, srv)
 
 	time.Sleep(1 * time.Second)
 
