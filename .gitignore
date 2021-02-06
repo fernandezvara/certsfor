@@ -17,3 +17,6 @@
 *.pem
 cmd/cfd/*.yaml
 dist/
+
+# Exclude binary generated after go build
+cmd/cfd/cfd

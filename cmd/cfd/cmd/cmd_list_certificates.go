@@ -39,11 +39,11 @@ import (
 // listCertificateCmd represents the bootstrap command
 var listCertificateCmd = &cobra.Command{
 	Use:     "certificate",
-	Aliases: []string{"cert"},
-	Short:   "Deletes a certificate by its Common Name from the store",
-	Long: `Deletes a certificate by its Common Name from the store
-	
-Every CA is identified by a UUID. 
+	Aliases: []string{"cert", "certificates"},
+	Short:   "List certificates associated with the CA",
+	Long: `List certificates associated with the CA
+
+Every CA is identified by a UUID.
 
 The CA ID is required on each request.`,
 	Run: listCertificateFunc,
