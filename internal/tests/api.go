@@ -24,7 +24,7 @@ type TestAPI struct {
 }
 
 // StartAPI is exported to be useful on other libraries tests. Starts the api in testing mode
-func (ta *TestAPI) StartAPI(t *testing.T, apiIPPort string, cert, key, caCert []byte, requireClientCert bool) {
+func (ta *TestAPI) StartAPI(t *testing.T, apiIPPort string, cert, key, caCert string, remaining int, requireClientCert bool) {
 
 	var (
 		sto store.Store
@@ -41,15 +41,15 @@ func (ta *TestAPI) StartAPI(t *testing.T, apiIPPort string, cert, key, caCert []
 
 	srv = service.NewAsServer(sto, Version)
 	ta.api = api.New(srv, Version)
-	go ta.api.Start(apiIPPort, cert, key, caCert, requireClientCert, []string{"stdout"}, []string{"stdout"}, true)
+	go ta.api.Start(apiIPPort, cert, key, caCert, remaining, requireClientCert, []string{"stdout"}, []string{"stdout"}, true)
 
 }
 
 // StartAPIWithService is exported to be useful on other libraries tests. Starts the api in testing mode
-func (ta *TestAPI) StartAPIWithService(t *testing.T, apiIPPort string, cert, key, caCert []byte, requireClientCert bool, srv *service.Service) {
+func (ta *TestAPI) StartAPIWithService(t *testing.T, apiIPPort string, cert, key, caCert string, remaining int, requireClientCert bool, srv *service.Service) {
 
 	ta.api = api.New(srv, Version)
-	go ta.api.Start(apiIPPort, cert, key, caCert, requireClientCert, []string{"stdout"}, []string{"stdout"}, true)
+	go ta.api.Start(apiIPPort, cert, key, caCert, remaining, requireClientCert, []string{"stdout"}, []string{"stdout"}, true)
 
 }
 

@@ -31,7 +31,7 @@ import (
 )
 
 // Version variable to be updated at build time
-var Version = "0.1"
+var Version = "snapshot"
 
 // global variables
 type globalConfig struct {

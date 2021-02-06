@@ -24,16 +24,12 @@ package cmd
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"os/signal"
-	"regexp"
 
 	"github.com/fernandezvara/certsfor/db/store"
 	"github.com/fernandezvara/certsfor/internal/api"
-	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/service"
-	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -50,64 +46,30 @@ func init() {
 	startCmd.AddCommand(apiCmd)
 }
 
-func isUUID(uuid string) bool {
-	return regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$").MatchString(uuid)
-}
-
-func fileBytes(filename string) ([]byte, error) {
-
-	if filename == "" {
-		return []byte{}, nil
-	}
-
-	return ioutil.ReadFile(filename)
-
-}
-
 func apiFunc(cmd *cobra.Command, args []string) {
 
 	var (
-		sto               store.Store
-		srv               *service.Service
-		a                 *api.API
-		cert, key, cacert []byte
-		err               error
+		sto store.Store
+		srv *service.Service
+		a   *api.API
+		err error
 	)
 
 	sto, err = store.Open(context.Background(), viper.GetString(configDBType), viper.GetString(configDBConnectionString))
 	er(err)
 	srv = service.NewAsServer(sto, Version)
 
-	if isUUID(viper.GetString(configTLSCA)) {
-		// get cert from DB
-		var (
-			ca  *manager.CA
-			crt client.Certificate
-		)
-
-		ca, err = srv.CAGet(viper.GetString(configTLSCA))
-		er(err)
-
-		crt, err = srv.CertificateGet(context.Background(), viper.GetString(configTLSCA), viper.GetString(configTLSCertificate), global.remaining)
-		er(err)
-
-		cacert = ca.CACertificateBytes()
-		cert = crt.Certificate
-		key = crt.Key
-
-	} else {
-		// ca certificate is a file?
-		cacert, err = fileBytes(viper.GetString(configTLSCA))
-		er(err)
-		cert, err = fileBytes(viper.GetString(configTLSCertificate))
-		er(err)
-		key, err = fileBytes(viper.GetString(configTLSKey))
-		er(err)
-
-	}
-
 	a = api.New(srv, Version)
-	go a.Start(viper.GetString(configAPIAddr), cert, key, cacert, viper.GetBool(configTLSRequireClientCertificate), viper.GetStringSlice(configAPIAccessLog), viper.GetStringSlice(configAPIErrorLog), viper.GetBool(configAPIDebugLog))
+	go a.Start(viper.GetString(configAPIAddr),
+		viper.GetString(configTLSCertificate),
+		viper.GetString(configTLSKey),
+		viper.GetString(configTLSCA),
+		global.remaining,
+		viper.GetBool(configTLSRequireClientCertificate),
+		viper.GetStringSlice(configAPIAccessLog),
+		viper.GetStringSlice(configAPIErrorLog),
+		viper.GetBool(configAPIDebugLog),
+	)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
