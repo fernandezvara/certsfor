@@ -81,6 +81,10 @@ func pathFromHome(paths ...string) (fullpath string) {
 
 }
 
+const (
+	timeFormat = "02/01/2006 15:04"
+)
+
 var (
 	global globalConfig
 

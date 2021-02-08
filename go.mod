@@ -15,11 +15,12 @@ require (
 	github.com/fernandezvara/rest v0.0.7
 	github.com/fernandezvara/scheduler v0.1.1
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/go-openapi/strfmt v0.20.0 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
+	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/jedib0t/go-pretty/v6 v6.1.0
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/kr/text v0.2.0 // indirect
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/manifoldco/promptui v0.8.0
@@ -27,7 +28,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/pelletier/go-toml v1.8.1 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
 	github.com/spf13/afero v1.5.1 // indirect
 	github.com/spf13/cast v1.3.1 // indirect

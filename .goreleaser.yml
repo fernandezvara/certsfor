@@ -106,6 +106,29 @@ nfpms:
     recommends:
       - golang
 
+scoop:
+  bucket:
+    owner: backd-io
+    name: scoop-bucket
+  homepage: https://www.certsfor.dev/
+  description: Easy certificate management for development environments
+  license: MIT
+  commit_author:
+    name: fernandezvara
+    email: antoniofernandezvara@gmail.com
+  commit_msg_template: "Scoop update - {{ .ProjectName }} - version: {{ .Tag }}"
+
+brews:
+  - tap:
+      owner: backd-io
+      name: homebrew-tap
+    folder: Formula
+    homepage: https://www.certsfor.dev/
+    description: Easy certificate management for development environments
+    license: MIT
+    test: |
+      system "#{bin}/cfd -h"
+
 release:
   github:
     owner: fernandezvara

@@ -102,9 +102,9 @@ func listCertificateFunc(cmd *cobra.Command, args []string) {
 		er(err)
 
 		if now.Before(certificate.X509Certificate.NotAfter) {
-			expires = fmt.Sprintf("%d days (%s)", int64(certificate.X509Certificate.NotAfter.Sub(now).Hours())/int64(24), certificate.X509Certificate.NotAfter.Format("02/01/2006 15:04"))
+			expires = fmt.Sprintf("%d days (%s)", int64(certificate.X509Certificate.NotAfter.Sub(now).Hours())/int64(24), certificate.X509Certificate.NotAfter.Format(timeFormat))
 		} else {
-			expires = fmt.Sprintf("Expired (%s)", certificate.X509Certificate.NotAfter.Format("02/01/2006 15:04"))
+			expires = fmt.Sprintf("Expired (%s)", certificate.X509Certificate.NotAfter.Format(timeFormat))
 		}
 
 		t.AppendRow(table.Row{

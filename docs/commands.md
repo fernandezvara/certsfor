@@ -101,6 +101,32 @@ By default, when a certificate is retrieved using the cli, it will ask the CA to
 >
 > Ex: `cdf get cert --ca-id <uuid> --cn <common-name> -c stdout`
 
+## info certificate / info cert
+
+**Usage:** `cfd info certificate [flags]`
+
+| Flag | Explanation | Environment Var | Required |
+| ---- | ----------- | --------------- | :------: |
+| `--ca-id` | ID of the CA to interact to. | CFD_CA_ID | if `--cn` |
+| `--cn` | Common name of the Certificate to query its information. | | if `--ca-id` |
+| `-f`, `--file` | Certificate file to get its information. | | |
+| `-u`, `--url` | URL to get its information | | |
+| `--insecure` | Do no make validations on the connection. (Only used if `--url`). | | |
+| `--timeout` | Timeout making the request to the URL. (Only used if `--url`). | | |
+| `--markdown` | Return data in `1markdown` format. | | |
+| `--csv` | Return data as CSV. | | |
+
+```bash
+> # example
+> cfd info cert --url www.google.com      
+┌────────────────┬───────────────────────────────────────────────────────────────────┬──────────────────┬─────────────────────────────┬────────────────┬───────┐
+│ Common Name    │ Distinguished Name                                                │ Not Before       │ Expires                     │ SANs           │ CA?   │
+├────────────────┼───────────────────────────────────────────────────────────────────┼──────────────────┼─────────────────────────────┼────────────────┼───────┤
+│ www.google.com │ CN=www.google.com,O=Google LLC,L=Mountain View,ST=California,C=US │ 19/01/2021 08:04 │ 63 days (13/04/2021 08:04)  │ www.google.com │ false │
+│ GTS CA 1O1     │ CN=GTS CA 1O1,O=Google Trust Services,C=US                        │ 15/06/2017 00:00 │ 309 days (15/12/2021 00:00) │                │ true  │
+└────────────────┴───────────────────────────────────────────────────────────────────┴──────────────────┴─────────────────────────────┴────────────────┴───────┘
+```
+
 ## list certificate / list certificates / list cert
 
 Return a list with all the certificates on the CA.
