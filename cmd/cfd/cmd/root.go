@@ -124,10 +124,17 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err != nil {
+	err := viper.ReadInConfig()
+
+	switch err.(type) {
+	case nil:
+	// do nothing
+	case *os.PathError:
+		echo("-- Using default configuration, no config file found.\n")
+	default:
 		er(err)
-		// echo(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
 	}
+
 }
 
 func isOutput() bool {

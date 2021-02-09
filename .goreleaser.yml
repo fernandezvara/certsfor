@@ -126,8 +126,13 @@ brews:
     homepage: https://www.certsfor.dev/
     description: Easy certificate management for development environments
     license: MIT
+    commit_author:
+      name: fernandezvara
+      email: antoniofernandezvara@gmail.com
     test: |
       system "#{bin}/cfd -h"
+    install:
+      bin.install "cfd"
 
 release:
   github:
