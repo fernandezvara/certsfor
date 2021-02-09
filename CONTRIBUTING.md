@@ -30,6 +30,22 @@ Final artifacts are building by using Github Actions. If you want to compile the
 > go build
 ```
 
+## Commit texts
+
+To maintain a coherent set of messages please use this format on commit messages when possible.
+
+`<type>: <message> #<issue number>`
+
+Where type os one of these:
+
+- fix: When the commit fixes a bug.
+- feature: A new feature is added to the service. (Remember to update the documentation reflecting the changes).
+- docs: Adds documentation. (really welcome these kind of commits).
+- ci: Continous integration related commits.
+- test: When some tests are pushed alone.
+
+On every release all commits will be added to the release notes automatically except those from `docs`, `ci` and `test`.
+
 ## Creating a PR
 
 When you have changes you would like to propose to `cdf`, you will need to:
