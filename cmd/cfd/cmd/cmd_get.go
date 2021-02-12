@@ -69,7 +69,7 @@ func getCertificateFunc(cmd *cobra.Command, args []string) {
 
 	collection = collectionOrExit()
 
-	cert, err = srv.CertificateGet(ctx, collection, global.cn, global.remaining)
+	cert, err = srv.CertificateGet(ctx, collection, global.cn, global.remaining, false)
 	er(err)
 
 	saveFiles(cert.CACertificate, cert.Certificate, cert.Key)

@@ -72,7 +72,7 @@ func listCertificateFunc(cmd *cobra.Command, args []string) {
 
 	collection = collectionOrExit()
 
-	certificates, err = srv.CertificateList(ctx, collection)
+	certificates, err = srv.CertificateList(ctx, collection, false) // TODO replace all code with the parsed information
 	er(err)
 
 	t = table.NewWriter()

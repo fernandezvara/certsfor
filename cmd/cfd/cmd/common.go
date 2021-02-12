@@ -65,7 +65,7 @@ func interactiveCertificate(request *client.APICertificateRequest, isCertificate
 	er(err)
 	request.DN.C, err = promptText("Country (optional)", request.DN.C, nil)
 	er(err)
-	request.DN.P, err = promptText("Province (optional)", request.DN.P, nil)
+	request.DN.P, err = promptText("Province / State (optional)", request.DN.P, nil)
 	er(err)
 	request.DN.L, err = promptText("Locality (optional)", request.DN.L, nil)
 	er(err)

@@ -101,7 +101,7 @@ func buildHTTPServer(srv *service.Service) (httpServer http.Server) {
 
 	collection = collectionOrExit()
 
-	cert, err = srv.CertificateGet(ctx, collection, global.cn, global.remaining)
+	cert, err = srv.CertificateGet(ctx, collection, global.cn, global.remaining, false)
 	er(err)
 
 	fullPath = path.Clean(global.root)

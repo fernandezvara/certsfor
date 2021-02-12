@@ -83,7 +83,7 @@ func infoCertificateFunc(cmd *cobra.Command, args []string) {
 		srv = buildService()
 		defer srv.Close()
 
-		response, err = srv.CertificateGet(ctx, collection, global.cn, 0)
+		response, err = srv.CertificateGet(ctx, collection, global.cn, 0, true)
 		er(err)
 
 		certInfo, err = certinfo.NewFromBytes(response.Certificate)
