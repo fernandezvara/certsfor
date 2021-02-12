@@ -14,14 +14,19 @@ func (a *API) getCertificates(w http.ResponseWriter, r *http.Request, ps httprou
 	var (
 		response map[string]client.Certificate
 		caID     string = ps.ByName("caid")
+		parse    bool
 		err      error
 	)
 
-	response, err = a.srv.CertificateList(r.Context(), caID)
-	// if len(response) == 0 {
-	// 	rest.NotFound(w, r)
-	// 	return
-	// }
+	if r.URL.Query().Get("parse") == "true" {
+		parse = true
+	}
+
+	response, err = a.srv.CertificateList(r.Context(), caID, parse)
+	if len(response) == 0 {
+		rest.NotFound(w, r)
+		return
+	}
 	rest.Response(w, response, err, http.StatusOK, "")
 
 }

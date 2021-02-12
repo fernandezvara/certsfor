@@ -117,7 +117,7 @@ func (s *Service) CAGet(collection string) (*manager.CA, error) {
 		err  error
 	)
 
-	cert, err = s.certificateGetAsServer(context.Background(), collection, "ca", 0)
+	cert, err = s.certificateGetAsServer(context.Background(), collection, "ca", 0, false)
 	if err != nil {
 		return nil, err
 	}
@@ -127,17 +127,17 @@ func (s *Service) CAGet(collection string) (*manager.CA, error) {
 }
 
 // CertificateGet returns the certificate and its key information
-func (s *Service) CertificateGet(ctx context.Context, collection, id string, remaining int) (client.Certificate, error) {
+func (s *Service) CertificateGet(ctx context.Context, collection, id string, remaining int, parse bool) (client.Certificate, error) {
 
 	if s.server {
-		return s.certificateGetAsServer(ctx, collection, id, remaining)
+		return s.certificateGetAsServer(ctx, collection, id, remaining, parse)
 	}
 
-	return s.certificateGetAsClient(ctx, collection, id, remaining)
+	return s.certificateGetAsClient(ctx, collection, id, remaining, parse)
 
 }
 
-func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string, remaining int) (certificate client.Certificate, err error) {
+func (s *Service) certificateGetAsServer(ctx context.Context, collection, id string, remaining int, parse bool) (certificate client.Certificate, err error) {
 
 	var (
 		caCertificate client.Certificate
@@ -184,6 +184,10 @@ func (s *Service) certificateGetAsServer(ctx context.Context, collection, id str
 				return
 			}
 
+			if parse {
+				s.parseCertificate(&certificate)
+			}
+
 			err = s.store.Set(ctx, collection, id, certificate)
 
 		}
@@ -194,10 +198,10 @@ func (s *Service) certificateGetAsServer(ctx context.Context, collection, id str
 
 }
 
-func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string, remaining int) (certificate client.Certificate, err error) {
+func (s *Service) certificateGetAsClient(ctx context.Context, collection, id string, remaining int, parse bool) (certificate client.Certificate, err error) {
 
 	// api must have a ?renew=20 to return the certificate autorenewed in the API!
-	certificate, err = s.client.CertificateGet(collection, id, remaining)
+	certificate, err = s.client.CertificateGet(collection, id, remaining, parse)
 	return
 
 }
@@ -273,17 +277,17 @@ func (s *Service) certificateSetAsServer(ctx context.Context, collection string,
 }
 
 // CertificateList returns an array of certificates and its x509 representation
-func (s *Service) CertificateList(ctx context.Context, collection string) (certificates map[string]client.Certificate, err error) {
+func (s *Service) CertificateList(ctx context.Context, collection string, parse bool) (certificates map[string]client.Certificate, err error) {
 
 	if s.server {
-		return s.certificateListAsServer(ctx, collection)
+		return s.certificateListAsServer(ctx, collection, parse)
 	}
 
-	return s.client.CertificateList(collection)
+	return s.client.CertificateList(collection, parse)
 
 }
 
-func (s *Service) certificateListAsServer(ctx context.Context, collection string) (certificates map[string]client.Certificate, err error) {
+func (s *Service) certificateListAsServer(ctx context.Context, collection string, parse bool) (certificates map[string]client.Certificate, err error) {
 
 	var (
 		mapCertificates []map[string]interface{}
@@ -325,11 +329,47 @@ func (s *Service) certificateListAsServer(ctx context.Context, collection string
 			return
 		}
 
+		if parse {
+			s.parseCertificate(&certificate)
+		}
+
 		certificates[certificate.X509Certificate.Subject.CommonName] = certificate
 
 	}
 
 	return
+}
+
+// type ParsedInfo struct {
+// 	Version        int      `json:"version"`
+// 	SerialNumber   string   `json:"serial_number"`
+// 	NotBefore      int64    `json:"not_before"`
+// 	NotAfter       int64    `json:"not_after"`
+// 	IsCA           bool     `json:"is_ca"`
+// 	DNSNames       []string `json:"dns_names"`
+// 	EmailAddresses []string `json:"emails"`
+// 	IPAddresses    []string `json:"ips"`
+// 	URIs           []string `json:"uris"`
+// }
+
+func (s Service) parseCertificate(certificate *client.Certificate) {
+
+	var parsedInfo client.ParsedInfo
+	parsedInfo.Version = certificate.X509Certificate.Version
+	parsedInfo.SerialNumber = certificate.X509Certificate.SerialNumber.String()
+	parsedInfo.NotBefore = certificate.X509Certificate.NotBefore.Unix()
+	parsedInfo.NotAfter = certificate.X509Certificate.NotAfter.Unix()
+	parsedInfo.IsCA = certificate.X509Certificate.IsCA
+	parsedInfo.DNSNames = certificate.X509Certificate.DNSNames
+	parsedInfo.EmailAddresses = certificate.X509Certificate.EmailAddresses
+	for _, ip := range certificate.X509Certificate.IPAddresses {
+		parsedInfo.IPAddresses = append(parsedInfo.IPAddresses, ip.String())
+	}
+	for _, uri := range certificate.X509Certificate.URIs {
+		parsedInfo.URIs = append(parsedInfo.URIs, uri.String())
+	}
+
+	certificate.Parsed = parsedInfo
 }
 
 // CertificateDelete removes the certificate from the store

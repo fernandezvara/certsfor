@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/fernandezvara/certsfor/db/badger" // store driver
 	"github.com/fernandezvara/certsfor/db/store"
+	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/service"
 	"github.com/fernandezvara/certsfor/internal/tests"
 	"github.com/fernandezvara/certsfor/pkg/client"
@@ -55,6 +56,8 @@ var (
 		SAN: []string{
 			"cert.example.com",
 			"192.168.1.2",
+			"test@example.com",
+			"https://an.uri.com/",
 		},
 		Key:            client.ECDSA521,
 		ExpirationDays: 90,
@@ -111,6 +114,7 @@ func TestAPIWithService(t *testing.T) {
 	testCreateCA(t, srvClient)
 	testCreateCertificate(t, srvClient)
 	testGetCertificates(t, srvClient)
+	testGetCertificatesParsed(t, srv)
 	testListCertificates(t, srvClient)
 	testDeleteCertificate(t, srvClient)
 
@@ -120,6 +124,27 @@ func TestAPIWithService(t *testing.T) {
 	// service without store
 	srvUseless := service.NewAsServer(nil, tests.Version)
 	assert.Nil(t, srvUseless.Close())
+
+}
+
+func testGetCertificatesParsed(t *testing.T, srv *service.Service) {
+
+	var (
+		certificate client.Certificate
+		err         error
+	)
+
+	certificate, err = srv.CertificateGet(context.Background(), caID, certRequest.DN.CN, 10, true)
+	assert.Nil(t, err)
+	certificate.X509Certificate, err = manager.CertificateFromPEM(certificate.Certificate)
+	assert.Equal(t, certificate.Parsed.Version, certificate.X509Certificate.Version)
+	assert.Len(t, certificate.Parsed.IPAddresses, 1)
+	assert.Len(t, certificate.Parsed.DNSNames, 1)
+	assert.Len(t, certificate.Parsed.EmailAddresses, 1)
+	assert.Len(t, certificate.Parsed.URIs, 1)
+	assert.Equal(t, certificate.Parsed.NotAfter, certificate.X509Certificate.NotAfter.Unix())
+	assert.Equal(t, certificate.Parsed.NotBefore, certificate.X509Certificate.NotBefore.Unix())
+	assert.False(t, certificate.Parsed.IsCA)
 
 }
 
@@ -189,31 +214,31 @@ func testGetCertificates(t *testing.T, srv *service.Service) {
 	)
 
 	// must fail, ca not found
-	_, err = srv.CertificateGet(ctx, "caID not found", "ca", 20)
+	_, err = srv.CertificateGet(ctx, "caID not found", "ca", 20, false)
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
 
-	certificate, err = srv.CertificateGet(ctx, caID, "ca", 20)
+	certificate, err = srv.CertificateGet(ctx, caID, "ca", 20, false)
 	assert.Nil(t, err)
 	assert.Equal(t, caCertificateBytes, certificate.CACertificate)
 	assert.Equal(t, caCertificateBytes, certificate.Certificate)
 	assert.Equal(t, caKeyBytes, certificate.Key)
 
-	certificate, err = srv.CertificateGet(ctx, caID, certRequest.DN.CN, 20)
+	certificate, err = srv.CertificateGet(ctx, caID, certRequest.DN.CN, 20, false)
 	assert.Nil(t, err)
 	assert.Equal(t, caCertificateBytes, certificate.CACertificate)
 	assert.Equal(t, certCertificateBytes, certificate.Certificate)
 	assert.Equal(t, certKeyBytes, certificate.Key)
 
-	certificate, err = srv.CertificateGet(ctx, caID, certRequest.DN.CN, 100)
+	certificate, err = srv.CertificateGet(ctx, caID, "notfound", 20, false)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
+
+	certificate, err = srv.CertificateGet(ctx, caID, certRequest.DN.CN, 100, true)
 	assert.Nil(t, err)
 	assert.Equal(t, caCertificateBytes, certificate.CACertificate)
 	assert.NotEqual(t, certCertificateBytes, certificate.Certificate)
 	assert.Equal(t, certKeyBytes, certificate.Key)
-
-	certificate, err = srv.CertificateGet(ctx, caID, "notfound", 20)
-	assert.NotNil(t, err)
-	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
 
 }
 
@@ -226,11 +251,11 @@ func testListCertificates(t *testing.T, srv *service.Service) {
 	)
 
 	// must fail, ca not found
-	_, err = srv.CertificateList(ctx, "caID not found")
+	_, err = srv.CertificateList(ctx, "caID not found", false)
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
 
-	certificates, err = srv.CertificateList(ctx, caID)
+	certificates, err = srv.CertificateList(ctx, caID, false)
 	assert.Nil(t, err)
 	assert.Len(t, certificates, 2)
 

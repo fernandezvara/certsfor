@@ -24,6 +24,7 @@ type Certificate struct {
 	X509Certificate *x509.Certificate     `json:"-"`
 	Request         APICertificateRequest `json:"request"`
 	CAID            string                `json:"ca_id,omitempty"`
+	Parsed          ParsedInfo            `json:"parsed,omitempty"`
 }
 
 // APICertificateRequest is the struct with the data needed to create a new
@@ -36,6 +37,19 @@ type APICertificateRequest struct {
 	Client         bool     `json:"client" yaml:"client"` // requesting a client certificate?
 }
 
+// ParsedInfo holds the information extracted from the certificate if required
+type ParsedInfo struct {
+	Version        int      `json:"version"`
+	SerialNumber   string   `json:"serial_number"`
+	NotBefore      int64    `json:"not_before"`
+	NotAfter       int64    `json:"not_after"`
+	IsCA           bool     `json:"is_ca"`
+	DNSNames       []string `json:"dns_names"`
+	EmailAddresses []string `json:"emails"`
+	IPAddresses    []string `json:"ips"`
+	URIs           []string `json:"uris"`
+}
+
 // APIDN is the struct of a Distinguished Name
 type APIDN struct {
 	CN string `json:"cn,omitempty" yaml:"cn"` // common name (required)
@@ -43,7 +57,7 @@ type APIDN struct {
 	L  string `json:"l,omitempty" yaml:"l"`   // locality
 	O  string `json:"o,omitempty" yaml:"o"`   // organization
 	OU string `json:"ou,omitempty" yaml:"ou"` // organization unit
-	P  string `json:"p,omitempty" yaml:"p"`   // province
+	P  string `json:"p,omitempty" yaml:"p"`   // province / state
 	PC string `json:"pc,omitempty" yaml:"pc"` // postal code
 	ST string `json:"st,omitempty" yaml:"st"` // street
 }

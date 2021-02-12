@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/fernandezvara/certsfor/db/badger" // store driver
+	"github.com/fernandezvara/certsfor/internal/manager"
 	"github.com/fernandezvara/certsfor/internal/tests"
 	"github.com/fernandezvara/certsfor/pkg/client"
 	"github.com/stretchr/testify/assert"
@@ -141,7 +142,7 @@ func TestClientWithErrors(t *testing.T) {
 	_, err = cliWithErrors.CertificateCreate("ca-uuid", "common-name", client.APICertificateRequest{})
 	assert.Error(t, err)
 
-	_, err = cliWithErrors.CertificateGet("ca-uuid", "common-name", 20)
+	_, err = cliWithErrors.CertificateGet("ca-uuid", "common-name", 20, false)
 	assert.Error(t, err)
 
 	_, err = cliWithErrors.CertificateDelete("ca-uuid", "common-name")
@@ -329,17 +330,17 @@ func getCertificate(t *testing.T, cli *client.Client) {
 	)
 
 	// 404 - Not found
-	_, err = cli.CertificateGet(caID, "404", 20)
+	_, err = cli.CertificateGet(caID, "404", 20, false)
 	assert.Error(t, err)
 	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
 
 	// 404 - Not found
-	_, err = cli.CertificateGet("1234", "404", 20)
+	_, err = cli.CertificateGet("1234", "404", 20, false)
 	assert.Error(t, err)
 	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
 
 	// 200 - OK, must match with the certificated created
-	certCertificate, err = cli.CertificateGet(caID, certRequest.DN.CN, 20)
+	certCertificate, err = cli.CertificateGet(caID, certRequest.DN.CN, 20, false)
 	assert.Nil(t, err)
 
 	assert.Equal(t, certRequest.DN.CN, certCertificate.Request.DN.CN)
@@ -349,7 +350,7 @@ func getCertificate(t *testing.T, cli *client.Client) {
 	assert.Equal(t, certCertificate.Key, certKeyBytes)
 
 	// 200 - OK, must match with the certificated created, but renewed
-	certCertificate, err = cli.CertificateGet(caID, certRequest.DN.CN, 100)
+	certCertificate, err = cli.CertificateGet(caID, certRequest.DN.CN, 100, true)
 	assert.Nil(t, err)
 
 	assert.Equal(t, certRequest.DN.CN, certCertificate.Request.DN.CN)
@@ -357,6 +358,14 @@ func getCertificate(t *testing.T, cli *client.Client) {
 	assert.Equal(t, certCertificate.CACertificate, caCertificateBytes)
 	assert.NotEqual(t, certCertificate.Certificate, certCertificateBytes)
 	assert.Equal(t, certCertificate.Key, certKeyBytes)
+
+	certCertificate.X509Certificate, err = manager.CertificateFromPEM(certCertificate.Certificate)
+	assert.Equal(t, certCertificate.Parsed.Version, certCertificate.X509Certificate.Version)
+	assert.Len(t, certCertificate.Parsed.IPAddresses, 1)
+	assert.Len(t, certCertificate.Parsed.DNSNames, 1)
+	assert.Len(t, certCertificate.Parsed.EmailAddresses, 0)
+	assert.Len(t, certCertificate.Parsed.URIs, 0)
+	assert.False(t, certCertificate.Parsed.IsCA)
 
 }
 
@@ -370,13 +379,19 @@ func listCertificates(t *testing.T, cli *client.Client) {
 	certificates = make(map[string]client.Certificate)
 
 	// 404 - Not found
-	_, err = cli.CertificateList("ca-not-found")
+	_, err = cli.CertificateList("ca-not-found", false)
 	assert.Error(t, err)
 	assert.Equal(t, http.StatusText(http.StatusNotFound), err.Error())
 
-	certificates, err = cli.CertificateList(caID)
+	certificates, err = cli.CertificateList(caID, false)
 	assert.Nil(t, err)
 	assert.Len(t, certificates, 3)
+
+	certificates, err = cli.CertificateList(caID, true)
+	assert.Nil(t, err)
+	assert.Len(t, certificates, 3)
+	fmt.Println(certificates)
+	assert.True(t, certificates["myca"].Parsed.IsCA)
 
 }
 
@@ -415,7 +430,7 @@ func deleteCertificate(t *testing.T, cli *client.Client) {
 	// ensure certificate was deleted
 	certificates = make(map[string]client.Certificate)
 
-	certificates, err = cli.CertificateList(caID)
+	certificates, err = cli.CertificateList(caID, false)
 	assert.Nil(t, err)
 	assert.Len(t, certificates, 2)
 

@@ -18,6 +18,7 @@ func (a *API) getCertificate(w http.ResponseWriter, r *http.Request, ps httprout
 		cn              string = ps.ByName("cn") // certificate common name
 		remainingString string
 		remaining       int
+		parse           bool
 		err             error
 	)
 
@@ -30,7 +31,11 @@ func (a *API) getCertificate(w http.ResponseWriter, r *http.Request, ps httprout
 		}
 	}
 
-	response, err = a.srv.CertificateGet(r.Context(), caID, cn, remaining)
+	if r.URL.Query().Get("parse") == "true" {
+		parse = true
+	}
+
+	response, err = a.srv.CertificateGet(r.Context(), caID, cn, remaining, parse)
 	rest.Response(w, response, err, http.StatusOK, "")
 
 }

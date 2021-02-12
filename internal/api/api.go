@@ -142,7 +142,7 @@ func getCertificates(tlsCertificate, tlsKey, tlsCaCert string, remaining int, sr
 			return
 		}
 
-		if crt, err = srv.CertificateGet(context.Background(), tlsCaCert, tlsCertificate, remaining); err != nil {
+		if crt, err = srv.CertificateGet(context.Background(), tlsCaCert, tlsCertificate, remaining, false); err != nil {
 			return
 		}
 
