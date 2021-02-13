@@ -39,6 +39,7 @@ type APICertificateRequest struct {
 
 // ParsedInfo holds the information extracted from the certificate if required
 type ParsedInfo struct {
+	DN             string   `json:"dn"`
 	Version        int      `json:"version"`
 	SerialNumber   string   `json:"serial_number"`
 	NotBefore      int64    `json:"not_before"`

@@ -355,13 +355,23 @@ func (s *Service) certificateListAsServer(ctx context.Context, collection string
 func (s Service) parseCertificate(certificate *client.Certificate) {
 
 	var parsedInfo client.ParsedInfo
+	parsedInfo.DNSNames = []string{}
+	parsedInfo.EmailAddresses = []string{}
+	parsedInfo.IPAddresses = []string{}
+	parsedInfo.URIs = []string{}
+
+	parsedInfo.DN = certificate.X509Certificate.Subject.ToRDNSequence().String()
 	parsedInfo.Version = certificate.X509Certificate.Version
 	parsedInfo.SerialNumber = certificate.X509Certificate.SerialNumber.String()
 	parsedInfo.NotBefore = certificate.X509Certificate.NotBefore.Unix()
 	parsedInfo.NotAfter = certificate.X509Certificate.NotAfter.Unix()
 	parsedInfo.IsCA = certificate.X509Certificate.IsCA
-	parsedInfo.DNSNames = certificate.X509Certificate.DNSNames
-	parsedInfo.EmailAddresses = certificate.X509Certificate.EmailAddresses
+	if certificate.X509Certificate.DNSNames != nil {
+		parsedInfo.DNSNames = certificate.X509Certificate.DNSNames
+	}
+	if certificate.X509Certificate.EmailAddresses != nil {
+		parsedInfo.EmailAddresses = certificate.X509Certificate.EmailAddresses
+	}
 	for _, ip := range certificate.X509Certificate.IPAddresses {
 		parsedInfo.IPAddresses = append(parsedInfo.IPAddresses, ip.String())
 	}
