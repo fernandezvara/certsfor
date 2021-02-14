@@ -39,7 +39,7 @@ var infoCertificateCmd = &cobra.Command{
 	Aliases: []string{"cert"},
 	Short:   "Show (friendly) information about a certificate.",
 	Long: `Show information about a certificate. Allows to get data from:
- 
+
   - File
   - Common Name
   - Remote URL
@@ -58,7 +58,7 @@ func init() {
 	infoCertificateCmd.Flags().StringVar(&global.collection, "ca-id", "", "CA Identifier. (required if --cn) [$CFD_CA_ID]")
 	infoCertificateCmd.Flags().StringVar(&global.cn, "cn", "", "Common name to query for information.")
 	infoCertificateCmd.Flags().StringVarP(&global.filename, "file", "f", "", "Source file with the certificate.")
-	infoCertificateCmd.Flags().StringVarP(&global.listen, "url", "u", "", "URL to get information from.")
+	infoCertificateCmd.Flags().StringVarP(&global.url, "url", "u", "", "URL to get information from.")
 	infoCertificateCmd.Flags().Int64Var(&timeout, "timeout", 5, "Timeout for network calls (only used if --url is especified).")
 	infoCertificateCmd.Flags().BoolVar(&insecure, "insecure", false, "Insecure allows skip verification of the server certificate (only used if --url is especified).")
 	infoCertificateCmd.Flags().BoolVar(&global.bool1, "markdown", false, "Return the data formatted as markdown.")
@@ -97,14 +97,16 @@ func infoCertificateFunc(cmd *cobra.Command, args []string) {
 			er(err)
 
 		} else {
-
-			if global.listen == "" {
+			if global.url == "" {
 				fmt.Println("Select the certificate to get its information")
+				fmt.Println()
+				// Print out the help information
+				cmd.Help()
 				os.Exit(1)
 			}
 
 			// if url getInfo.from URL()
-			certInfo, err = certinfo.NewFromURL(global.listen, timeout, insecure)
+			certInfo, err = certinfo.NewFromURL(global.url, timeout, insecure)
 			er(err)
 
 		}
