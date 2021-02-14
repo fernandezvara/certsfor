@@ -359,6 +359,8 @@ func (s Service) parseCertificate(certificate *client.Certificate) {
 	parsedInfo.EmailAddresses = []string{}
 	parsedInfo.IPAddresses = []string{}
 	parsedInfo.URIs = []string{}
+	parsedInfo.KeyUsage = []string{}
+	parsedInfo.ExtKeyUsage = []string{}
 
 	parsedInfo.DN = certificate.X509Certificate.Subject.ToRDNSequence().String()
 	parsedInfo.Version = certificate.X509Certificate.Version
@@ -377,6 +379,18 @@ func (s Service) parseCertificate(certificate *client.Certificate) {
 	}
 	for _, uri := range certificate.X509Certificate.URIs {
 		parsedInfo.URIs = append(parsedInfo.URIs, uri.String())
+	}
+
+	var index int
+	for index = 0; index < len(client.KeyUsages); index++ {
+		if certificate.X509Certificate.KeyUsage&x509.KeyUsage(1<<index) != 0 {
+			parsedInfo.KeyUsage = append(parsedInfo.KeyUsage, client.KeyUsages[index])
+		}
+	}
+
+	// all extended usages
+	for _, extUsage := range certificate.X509Certificate.ExtKeyUsage {
+		parsedInfo.ExtKeyUsage = append(parsedInfo.ExtKeyUsage, client.ExtKeyUsages[extUsage])
 	}
 
 	certificate.Parsed = parsedInfo

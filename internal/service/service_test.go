@@ -130,8 +130,9 @@ func TestAPIWithService(t *testing.T) {
 func testGetCertificatesParsed(t *testing.T, srv *service.Service) {
 
 	var (
-		certificate client.Certificate
-		err         error
+		certificate  client.Certificate
+		certificates map[string]client.Certificate
+		err          error
 	)
 
 	certificate, err = srv.CertificateGet(context.Background(), caID, certRequest.DN.CN, 10, true)
@@ -145,6 +146,10 @@ func testGetCertificatesParsed(t *testing.T, srv *service.Service) {
 	assert.Equal(t, certificate.Parsed.NotAfter, certificate.X509Certificate.NotAfter.Unix())
 	assert.Equal(t, certificate.Parsed.NotBefore, certificate.X509Certificate.NotBefore.Unix())
 	assert.False(t, certificate.Parsed.IsCA)
+
+	certificates, err = srv.CertificateList(context.Background(), caID, true)
+	assert.Nil(t, err)
+	assert.Len(t, certificates, 2)
 
 }
 

@@ -49,6 +49,39 @@ type ParsedInfo struct {
 	EmailAddresses []string `json:"emails"`
 	IPAddresses    []string `json:"ips"`
 	URIs           []string `json:"uris"`
+	KeyUsage       []string `json:"key_usage"`
+	ExtKeyUsage    []string `json:"ext_key_usage"`
+}
+
+// KeyUsages is the posible usags for a key as array of strings
+var KeyUsages = []string{
+	"Digital Signature",
+	"Content Commitment",
+	"Key Encipherment",
+	"Data Encipherment",
+	"Key Agreement",
+	"Cert Sign",
+	"CRL Sign",
+	"Encipher Only",
+	"Decipher Only",
+}
+
+// ExtKeyUsages is the posible extended usages for a key as array of strings
+var ExtKeyUsages = []string{
+	"Any",
+	"Server Auth",
+	"Client Auth",
+	"Code Signing",
+	"Email Protection",
+	"IPSEC End System",
+	"IPSEC Tunnel",
+	"IPSEC User",
+	"Time Stamping",
+	"OCSP Signing",
+	"Microsoft Server Gated Crypto",
+	"Netscape Server Gated Crypto",
+	"Microsoft Commercial Code Signing",
+	"Microsoft Kernel Code Signing}",
 }
 
 // APIDN is the struct of a Distinguished Name
