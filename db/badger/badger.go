@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/dgraph-io/badger"
 	"github.com/fernandezvara/certsfor/db/store"
@@ -36,6 +37,10 @@ func (f Driver) Open(ctx context.Context, connection string) (store.Store, error
 	}
 
 	opts = badger.DefaultOptions(connection).WithSyncWrites(true)
+
+	if runtime.GOOS == "windows" {
+		opts = opts.WithTruncate(true)
+	}
 
 	store.db, err = badger.Open(opts)
 	if err != nil {

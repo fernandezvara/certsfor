@@ -15,6 +15,7 @@
 # vendor/
 
 *.pem
+*.pfx
 cmd/cfd/*.yaml
 dist/
 
