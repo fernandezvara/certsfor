@@ -346,7 +346,7 @@ nV3Z8XSWsFRPth5prC//U9OnGFAcKy9rHMtGR6vO1BuTdwWsNY+R0LQUJ3C1
 
 	assert.Nil(t, errCA)
 	assert.Error(t, err)
-	assert.Equal(t, "asn1: syntax error: data truncated", err.Error())
+	assert.Equal(t, "x509: malformed certificate", err.Error())
 
 	errCA, err = FromBytes([]byte(goodCert), []byte(badKey))
 
@@ -364,7 +364,7 @@ nV3Z8XSWsFRPth5prC//U9OnGFAcKy9rHMtGR6vO1BuTdwWsNY+R0LQUJ3C1
 
 	assert.Nil(t, errCA)
 	assert.Error(t, err)
-	assert.Equal(t, "asn1: syntax error: data truncated", err.Error())
+	assert.Equal(t, "x509: malformed certificate", err.Error())
 
 	errCA, err = FromBytes([]byte(badCert2), []byte(goodKey))
 
