@@ -6,6 +6,7 @@
 - Usage
   
   - [Commands](commands.md)
+  - [Quick Example](example.md)
 
 - Distributed usage
 
