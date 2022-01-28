@@ -56,7 +56,7 @@ exp: 365
 client: true
 ```
 
-# Stemps to create all the certificates
+# Steps to create all the certificates
 
 ```bash
 >
