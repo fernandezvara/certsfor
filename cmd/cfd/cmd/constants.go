@@ -48,6 +48,7 @@ type globalConfig struct {
 	bool2       bool   // common bool option
 	remaining   int    // remaining percert (integer) for expiration
 	listen      string // webserver ip:port to listen
+	url         string // url to consult for certificates
 	root        string // webserver root
 	quiet       bool   // run in quiet mode
 	pfxFile     string // pfx file to save
