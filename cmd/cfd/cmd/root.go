@@ -103,11 +103,6 @@ func initConfig() {
 	viper.SetDefault(configQuiet, configQuietDefault)
 	viper.BindEnv(configQuiet, configQuietEnv)
 
-	global.quiet = viper.GetBool(configQuiet)
-
-	// force quiet mode? when echoing to stdout we must clean the output
-	global.quiet = isOutput()
-
 	if os.Getenv("CFD_CONFIG") != "" {
 		global.cfgFile = os.Getenv("CFD_CONFIG")
 	}
@@ -128,11 +123,16 @@ func initConfig() {
 
 	switch err.(type) {
 	case nil:
-	// do nothing
+		// do nothing
 	case *os.PathError:
 		echo("-- Using default configuration, no config file found.\n")
 	default:
 		er(err)
+	}
+
+	// force quiet mode? when echoing to stdout we must clean the output
+	if viper.GetBool(configQuiet) || isOutput() {
+		global.quiet = true
 	}
 
 }

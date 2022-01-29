@@ -36,7 +36,7 @@ func (f Driver) Open(ctx context.Context, connection string) (store.Store, error
 		return nil, err
 	}
 
-	opts = badger.DefaultOptions(connection).WithSyncWrites(true)
+	opts = badger.DefaultOptions(connection).WithSyncWrites(true).WithLogger(nil)
 
 	if runtime.GOOS == "windows" {
 		opts = opts.WithTruncate(true)
