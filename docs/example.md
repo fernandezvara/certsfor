@@ -145,6 +145,4 @@ You can automate all the workflow of certifications to be usable in any pipeline
 > cfd create certificate -c ./server.cer.pem -k ./server.key.pem -b server.bundle.pem -f ./server.yaml
 > cfd create certificate -c ./client.cer.pem -k ./client.key.pem -f ./client.yaml
 >
-
-
 ```
