@@ -1,6 +1,6 @@
 # config.yaml
 
-The configuration file allows to configure several parts of the tool/service. Normally for a solo developer default configuration is enough.
+The configuration file allows configuring several parts of the tool/service. For a solo developer, the default configuration is enough.
 
 By default, its stored in `$HOME/.cfd/config.yaml`.
 

@@ -61,10 +61,10 @@ client: true
 ```bash
 >
 > # If you need an empty template
->
 > cfd create template
-> # this will create a yaml template for fill the information needed in
-> # 
+> # this will create a YAML template for fill the information needed in
+>
+> 
 > # in this example there are already 3 templates filled (see above its contents):
 > # ca.yaml
 > # server.yaml
@@ -75,8 +75,8 @@ client: true
 CA Created. ID: '6b834a85-0ad2-4eeb-a148-e8d2eda4d8aa'
 
 > # we just created a CA. Every CA is identified internally by an ID. 
-> # so we need to ensure we save the ID for future reference.
-> # for convenience we can set it in a environment variable
+> # So, we need to ensure we save the ID for future reference.
+> # for convenience, we can set it in an environment variable
 >
 > # if you are on linux / macos
 > export CFD_CA_ID="6b834a85-0ad2-4eeb-a148-e8d2eda4d8aa"
@@ -84,11 +84,11 @@ CA Created. ID: '6b834a85-0ad2-4eeb-a148-e8d2eda4d8aa'
 > # on windows
 > set CFD_CA_ID=6b834a85-0ad2-4eeb-a148-e8d2eda4d8aa
 >
-> # now create server and client certificates:
+> # Create server and client certificates:
 > cfd create certificate -c ./server.cer.pem -k ./server.key.pem -b server.bundle.pem --pfx ./server.pfx -f ./server.yaml
 > cfd create certificate -c ./client.cer.pem -k ./client.key.pem --pfx ./client.pfx -f ./client.yaml
 >
-> # now all your certificates are ready to use
+> # Now all your certificates are ready to use.
 >
 > dir
  Volume in drive C has no label.
@@ -113,7 +113,7 @@ CA Created. ID: '6b834a85-0ad2-4eeb-a148-e8d2eda4d8aa'
 01/28/2022  07:54 AM               121 server.yaml
 01/28/2022  07:55 AM               125 template.yaml
 
-> # you can list the certificates created
+> # You can list the certificates created
 >cfd list cert
 
 ┌─────────────────┬────────────────────┬─────────────────────────────┐
@@ -125,3 +125,26 @@ CA Created. ID: '6b834a85-0ad2-4eeb-a148-e8d2eda4d8aa'
 └─────────────────┴────────────────────┴─────────────────────────────┘
 
 ``` 
+
+# Fully automated
+
+You can automate all the workflow of certifications to be usable in any pipeline. This example automates the creation of a new CA, server and client certificates. This allows recreating an environment from scratch using fresh certificates every time.
+
+
+```bash
+>
+> # if you are on linux / macos
+> export CFD_CA_ID=`cfd create ca -c ./ca.cer.pem -k ./ca.key.pem -f ./ca.yaml -q`
+>
+> # on windows (in this example we use a temporal file)
+> cfd create ca -c ./ca.cer.pem -k ./ca.key.pem -f ./ca.yaml -q>tmp.txt
+> set /P CFD_CA_ID=<tmp.txt
+> del tmp.txt
+
+> # now create server and client certificates:
+> cfd create certificate -c ./server.cer.pem -k ./server.key.pem -b server.bundle.pem -f ./server.yaml
+> cfd create certificate -c ./client.cer.pem -k ./client.key.pem -f ./client.yaml
+>
+
+
+```

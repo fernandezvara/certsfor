@@ -8,7 +8,7 @@ Use this database if using a local development machine for simplicity (you don't
 
 **Backup**: Copy full content of the selected database directory.
 
-**Restore**: Just copy the back up back and start the service.
+**Restore**: Just copy the backup back and start the service.
 
 >The service needs to be stopped to ensure back up and restore, `badger` *locks data files* making the process to (normally) fail.
 
@@ -37,7 +37,7 @@ Firebase has generous limits on its free plan so unless you are creating a big a
 
 #### Database creation
 
-- First, you need to register in Firebase; if you have a Google account it will be a straight forward step.
+- First, you need to register in Firebase; if you have a Google account, it will be a straight forward step.
 
 - Go to the Console, and you will be prompted with a 'Create a new Project', click it. A wizard will guide you in the process.
 
@@ -47,7 +47,7 @@ Firebase has generous limits on its free plan so unless you are creating a big a
 
 - **Add Analytics if you think you will need them**
 
-If you select to use analytics you will be asked for the project to use or set up a new one. *Refer to the Analytics documentation.*
+If you select to use analytics, you will be asked for the project to use or set up a new one. *Refer to the Analytics documentation.*
 
 ![Step 2. Analytics needed?](./images/firestore-2.png)
 
@@ -59,7 +59,7 @@ If you select to use analytics you will be asked for the project to use or set u
 
 ![Step 4. Create database](./images/firestore-4.png)
 
-- **Select 'Start in production mode' to secure the data store from guests**
+- **Select 'Start in production mode' to secure the datastore from guests**
 
 ![Step 5. Production mode](./images/firestore-5.png)
 

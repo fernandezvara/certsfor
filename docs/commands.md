@@ -13,7 +13,7 @@ Global Flags:
 
 **Usage:** `cfd configfile`
 
-By default, the tool comes configured with sane defaults to start working, so there is not configuration file needed. If you are a solo developer probably you won't need to change anything.
+By default, the tool comes configured with sane defaults to start working. If you are a solo developer probably, creating a configuration file won't be needed.
 
 Default configuration file is `$HOME/.cfd/config.yaml` and default database will be created on `$HOME/.cfd/db`. You can use other configuration file by using the global flag `--config`.
 
@@ -21,18 +21,18 @@ Default configuration file is `$HOME/.cfd/config.yaml` and default database will
 
 Creates a new Certification Authority based on the answers received, interactively or by using a template file. You can customize where to store the certificate file (`-c`, `--cert`) and its key (`-k`, `--key`).
 
-By using template files you can automate all certificate creation.
+By using template files, you can automate all certificate creation.
 
 **Usage:** `cfd create ca [flags]`
 
 | Flag | Explanation | Environment Var | Required |
 | ---- | ----------- | --------------- | -------- |
 | `-c`, `--cert` | Where to store the CA Certificate after its creation. | | |
-| `-k`, `--key` | Where to store the key file. *Normally you don't need this file*. | | |
+| `-k`, `--key` | Where to store the key file. *Normally, you don't need this file*. | | |
 | `-f`, `--file` | File with the answers in YAML format. | | |
 
 > [!TIP]
-> The CA ID is the identification that needs to be passed to the tool to make the operations with the right CA. The ID can be passed by:
+> The CA ID identifies the group of certificates to use. It needs to passed to the tool to make the operations with the right CA. The ID can be passed by:
 >
 >- Flag: `--ca-id="your uuid"`
 >- Environment variable (`$CFD_CA_ID`)
@@ -43,7 +43,7 @@ By using template files you can automate all certificate creation.
 
 ## create certificate
 
-Certificate creation expects the same answers than the CA.
+Certificate creation expects the same answers as the CA.
 
 **Usage:** `cfd create certificate [flags]`
 
@@ -80,7 +80,7 @@ Writes an empty certificate creation template as YAML file.
 
 Retrieve any certificate using its Common Name as Identifier. This command will get the certificate stored on the database if valid or will get a new updated one.
 
-By default, when a certificate is retrieved using the cli, it will ask the CA to renew it if the time remaining for its expiration is less than the desired percent.
+By default, when a certificate is retrieved using the CLI, it will ask the CA to renew it if the time remaining for its expiration is less than the desired percent.
 
 **Usage:** `cfd get certificate [flags]`
 
