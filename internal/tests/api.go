@@ -3,8 +3,10 @@ package tests
 import (
 	"context"
 	"io/ioutil"
+	"net"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/fernandezvara/certsfor/db/store"
 	"github.com/fernandezvara/certsfor/internal/api"
@@ -41,7 +43,7 @@ func (ta *TestAPI) StartAPI(t *testing.T, apiIPPort string, cert, key, caCert st
 
 	srv = service.NewAsServer(sto, Version)
 	ta.api = api.New(srv, Version)
-	go ta.api.Start(apiIPPort, cert, key, caCert, remaining, requireClientCert, []string{"stdout"}, []string{"stdout"}, true)
+	ta.startServing(t, apiIPPort, cert, key, caCert, remaining, requireClientCert)
 
 }
 
@@ -49,7 +51,28 @@ func (ta *TestAPI) StartAPI(t *testing.T, apiIPPort string, cert, key, caCert st
 func (ta *TestAPI) StartAPIWithService(t *testing.T, apiIPPort string, cert, key, caCert string, remaining int, requireClientCert bool, srv *service.Service) {
 
 	ta.api = api.New(srv, Version)
-	go ta.api.Start(apiIPPort, cert, key, caCert, remaining, requireClientCert, []string{"stdout"}, []string{"stdout"}, true)
+	ta.startServing(t, apiIPPort, cert, key, caCert, remaining, requireClientCert)
+
+}
+
+// startServing initializes the API synchronously, serves it in the background and waits until it accepts connections
+func (ta *TestAPI) startServing(t *testing.T, apiIPPort string, cert, key, caCert string, remaining int, requireClientCert bool) {
+
+	err := ta.api.Init(apiIPPort, cert, key, caCert, remaining, requireClientCert, []string{"stdout"}, []string{"stdout"}, true)
+	if !assert.Nil(t, err) {
+		return
+	}
+
+	go ta.api.Serve()
+
+	assert.Eventually(t, func() bool {
+		conn, err := net.DialTimeout("tcp", apiIPPort, 100*time.Millisecond)
+		if err != nil {
+			return false
+		}
+		conn.Close()
+		return true
+	}, 5*time.Second, 10*time.Millisecond, "api did not start listening")
 
 }
 

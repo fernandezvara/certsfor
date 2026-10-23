@@ -32,8 +32,9 @@ func New(srv *service.Service, version string) *API {
 
 }
 
-// Start the API
-func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCaCert string, remaining int, requireClientCertificate bool, outputPaths, errorOutputPaths []string, debug bool) error {
+// Init prepares the API: builds the logger, loads the certificates and sets up the router.
+// It runs synchronously so every field is ready before Serve or Stop are called from other goroutines.
+func (a *API) Init(apiPort string, tlsCertificate, tlsKey, tlsCaCert string, remaining int, requireClientCertificate bool, outputPaths, errorOutputPaths []string, debug bool) error {
 
 	var (
 		routes            map[string]map[string]rest.APIEndpoint
@@ -84,6 +85,9 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCaCert string, re
 
 	// load certificate
 	cert, key, cacert, startScheduler, err = getCertificates(tlsCertificate, tlsKey, tlsCaCert, remaining, a.srv)
+	if err != nil {
+		return err
+	}
 
 	a.server, err = rest.New(apiPort, cert, key, cacert, requireClientCertificate, a.logger)
 	if err != nil {
@@ -94,8 +98,14 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCaCert string, re
 
 		// look if an certificate update must be done daily
 		fn := func() {
-			cert, key, _, _, err = getCertificates(tlsCertificate, tlsKey, tlsCaCert, remaining, a.srv)
-			a.server.SetCertificate(cert, key)
+			c, k, _, _, err := getCertificates(tlsCertificate, tlsKey, tlsCaCert, remaining, a.srv)
+			if err != nil {
+				a.logger.Error("api", "certificate renewal failed: "+err.Error())
+				return
+			}
+			if err = a.server.SetCertificate(c, k); err != nil {
+				a.logger.Error("api", "certificate renewal failed: "+err.Error())
+			}
 		}
 
 		scheduler.Every(1).Minutes().NotImmediately().Run(fn)
@@ -104,10 +114,25 @@ func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCaCert string, re
 
 	a.server.SetupRouter(routes)
 
-	// graceful
-	err = a.server.Start()
+	return nil
 
-	return err
+}
+
+// Serve runs the HTTP server, blocking until it is shut down. Init must have been called first.
+func (a *API) Serve() error {
+
+	return a.server.Start()
+
+}
+
+// Start initializes and serves the API, blocking until it is shut down.
+func (a *API) Start(apiPort string, tlsCertificate, tlsKey, tlsCaCert string, remaining int, requireClientCertificate bool, outputPaths, errorOutputPaths []string, debug bool) error {
+
+	if err := a.Init(apiPort, tlsCertificate, tlsKey, tlsCaCert, remaining, requireClientCertificate, outputPaths, errorOutputPaths, debug); err != nil {
+		return err
+	}
+
+	return a.Serve()
 
 }
 

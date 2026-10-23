@@ -4,7 +4,6 @@ import (
 	"context"
 	"io/ioutil"
 	"testing"
-	"time"
 
 	_ "github.com/fernandezvara/certsfor/db/badger" // store driver
 	"github.com/fernandezvara/certsfor/db/store"
@@ -19,8 +18,6 @@ func TestAPIForTesting(t *testing.T) {
 	testAPI := TestAPI{}
 
 	testAPI.StartAPI(t, localIPPort, "", "", "", 0, false)
-
-	time.Sleep(1 * time.Second)
 
 	err := testAPI.StopAPI(t)
 	assert.Nil(t, err)
@@ -50,8 +47,6 @@ func TestAPIWithService(t *testing.T) {
 	testAPI := TestAPI{}
 
 	testAPI.StartAPIWithService(t, localIPPort, "", "", "", 0, false, srv)
-
-	time.Sleep(1 * time.Second)
 
 	err = testAPI.StopAPI(t)
 	assert.Nil(t, err)

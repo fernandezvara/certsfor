@@ -24,6 +24,7 @@ package cmd
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 
@@ -60,7 +61,7 @@ func apiFunc(cmd *cobra.Command, args []string) {
 	srv = service.NewAsServer(sto, Version)
 
 	a = api.New(srv, Version)
-	go a.Start(viper.GetString(configAPIAddr),
+	err = a.Init(viper.GetString(configAPIAddr),
 		viper.GetString(configTLSCertificate),
 		viper.GetString(configTLSKey),
 		viper.GetString(configTLSCA),
@@ -70,6 +71,13 @@ func apiFunc(cmd *cobra.Command, args []string) {
 		viper.GetStringSlice(configAPIErrorLog),
 		viper.GetBool(configAPIDebugLog),
 	)
+	er(err)
+
+	go func() {
+		if err := a.Serve(); err != http.ErrServerClosed {
+			er(err)
+		}
+	}()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)

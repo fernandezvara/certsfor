@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"testing"
 	"time"
 
@@ -129,9 +130,20 @@ func TestInternalFileCertificates(t *testing.T) {
 
 	a = New(srv, "test")
 
-	go a.Start("127.0.0.1:65000", "cert", "", caID, 100, false, []string{"stdout"}, []string{"stdout"}, true)
+	err = a.Init("127.0.0.1:65000", "cert", "", caID, 100, false, []string{"stdout"}, []string{"stdout"}, true)
+	assert.Nil(t, err)
 
-	time.Sleep(1 * time.Second)
+	go a.Serve()
+
+	assert.Eventually(t, func() bool {
+		conn, err := net.DialTimeout("tcp", "127.0.0.1:65000", 100*time.Millisecond)
+		if err != nil {
+			return false
+		}
+		conn.Close()
+		return true
+	}, 5*time.Second, 10*time.Millisecond)
+
 	err = a.Stop()
 	assert.Nil(t, err)
 
